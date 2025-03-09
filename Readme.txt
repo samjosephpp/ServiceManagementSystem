@@ -1,11 +1,9 @@
 
 Project Description
 
-The Services Management System is a web-based platform designed to connect clients
-with service providers such as plumbers, cleaners, electricians, and more. The system
-allows clients to request services, and service providers can accept requests based on their
-availability. Admins can verify the authenticity of service providers to ensure quality and
-reliability.
+The Services Management System is a web-based platform designed to connect clients with service providers such as plumbers, cleaners, electricians, and more. The system
+allows clients to request services, and service providers can accept requests based on their availability. 
+Admins can verify the authenticity of service providers to ensure quality and reliability.
 
 Objectives
 
