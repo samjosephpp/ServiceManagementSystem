@@ -12,8 +12,8 @@ const masterSchema = new mongoose.Schema({
      updatedAt : { type: Date, default : Date.now},
      UpdatedBy : {type : mongoose.Schema.Types.ObjectId ,
         ref: "User"
-     },
-     isActive : { type : Boolean, default: true},
+     }
+     //, isActive : { type : Boolean, default: true},
 
 },  { timestamps : false});
 
@@ -27,26 +27,26 @@ const CompanySchema = new mongoose.Schema({
 
 const StateSchema = new mongoose.Schema({
     ...masterSchema.obj,
-    name: String,
-    code: String,
+    name: {type: String, required: true },
+    code: {type: String, required: true},
     description: String,
-    isActive: Boolean
+    isActive: {type : Boolean, default : true}
 });     //, { timestamps: true }
 
 const LocationSchema = new mongoose.Schema({
     ...masterSchema.obj,
-    name: String,
-    isActive: Boolean,
-    stateId: { type: mongoose.Schema.Types.ObjectId, ref: 'State' },
+    name: {type: String, required: true },
+    isActive:  { type : Boolean, default: true},
+    stateId: { type: mongoose.Schema.Types.ObjectId, ref: 'State', required: true },
     pincode: String,
-    code: String
+    code: {type: String, required: true }
 });     //, { timestamps: true }
 
 const ServiceCategorySchema = new mongoose.Schema({
     ...masterSchema.obj,
-    name: String,
-    code: String,
-    isActive: Boolean,
+    name: {type: String, required: true },
+    code: {type: String, required: true },
+    isActive:  { type : Boolean, default: true},
     description: String
 }); //, { timestamps: true }
 
