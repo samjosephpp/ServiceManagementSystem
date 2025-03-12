@@ -3,15 +3,15 @@ const { masterSchema } = require('./masterModels')
 
 const ServiceRequestSchema = new mongoose.Schema({
     ...masterSchema.obj,
-    clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
-    providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider' },
-    providerServiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProviderService' },
+    clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+    providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider' , required: true },
+    providerServiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProviderService'  , required: true},
     status: { type: String, enum: ['Pending', 'Accepted', 'Declined', 'Completed'], default: 'Pending' },
-    stateId: { type: mongoose.Schema.Types.ObjectId, ref: 'State' },
-    locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' },
-    address: String,
-    remarks: String,
-    isPaid: Boolean,
+    stateId: { type: mongoose.Schema.Types.ObjectId, ref: 'State' , required: true},
+    locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Location'  , required: true },
+    address: {type :String,  required: true},
+    remarks: {type: String},
+    isPaid: {type: Boolean, default: false},
     amount: Number
 }); //, { timestamps: true }
 
