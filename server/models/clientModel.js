@@ -3,11 +3,11 @@ const { masterSchema } = require('./masterModels')
 
 const ClientSchema = new mongoose.Schema({
     ...masterSchema.obj,
-    name: String,
+    name: { type: String, required: true },
     locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' },
-    email: String,
+    email: { type: String, required: true },
     phone: String,
-    isActive: Boolean,
+    isActive: { type:Boolean , default: true },
     description: String
 }); // , { timestamps: true }
 

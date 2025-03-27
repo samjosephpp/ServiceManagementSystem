@@ -6,9 +6,9 @@ const { authenticateToken } = require('../middleware/authUser')
 
 const serviceController =  require('../controllers/serviceController')
 
-// Route to get available services
+// Route to get available services //authenticateToken not required
 //http://localhost:3000/api/services/available-services?serviceCategoryId=abc123&locationId=xyz789
-router.get('/available-services', authenticateToken, async (req, res, next) => {
+router.get('/available-services0',  async (req, res, next) => {
     const { serviceCategoryId, locationId } = req.query;
 
     if (!serviceCategoryId || !locationId) {
@@ -40,6 +40,8 @@ router.post('/service-feedback', authenticateToken, serviceController.serviceFee
 router.patch('/service-request/:id/status', authenticateToken, serviceController.updateRequestStatus);
 // Route to get all service requests with authentication
 router.get('/all-service-requests', authenticateToken, serviceController.getAllRequest);
+// Route to get available services
+router.get('/available-services', serviceController.getAvailableServices);
 
 
 module.exports = {serviceRouter : router}

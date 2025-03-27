@@ -1,0 +1,7 @@
+
+@import "tailwindcss";
+/* DaisyUI plugin configuration should be done in the Tailwind CSS config file */
+/* @plugin "daisyui"; */
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+  }

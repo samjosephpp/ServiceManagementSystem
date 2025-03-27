@@ -6,11 +6,11 @@ const masterSchema = new mongoose.Schema({
     createdBy : { type: mongoose.Schema.Types.ObjectId, 
         ref: "User",
         // required: function() {
-        //     return this.role != "admin";
+        //     return this.role != "Admin";
         // }
      },
      updatedAt : { type: Date, default : Date.now},
-     UpdatedBy : {type : mongoose.Schema.Types.ObjectId ,
+     updatedBy : {type : mongoose.Schema.Types.ObjectId ,
         ref: "User"
      }
      //, isActive : { type : Boolean, default: true},
@@ -32,6 +32,15 @@ const StateSchema = new mongoose.Schema({
     description: String,
     isActive: {type : Boolean, default : true}
 });     //, { timestamps: true }
+// Pre-save hook to generate unique state code
+StateSchema.pre('save', function(next) {
+    if(!code){
+        const timestamp =  Date.now();
+        const ts  = Date.now().timestamps;         
+        this.code = `ST0${timestamp}`
+    }
+});
+
 
 const LocationSchema = new mongoose.Schema({
     ...masterSchema.obj,
@@ -41,6 +50,14 @@ const LocationSchema = new mongoose.Schema({
     pincode: String,
     code: {type: String, required: true }
 });     //, { timestamps: true }
+// Pre-save hook to generate unique Location code
+LocationSchema.pre('save', function(next) {
+    if(!code){
+        const timestamp =  Date.now();
+        const ts  = Date.now().timestamps;         
+        this.code = `L00${timestamp}`
+    }
+});
 
 const ServiceCategorySchema = new mongoose.Schema({
     ...masterSchema.obj,
@@ -49,7 +66,14 @@ const ServiceCategorySchema = new mongoose.Schema({
     isActive:  { type : Boolean, default: true},
     description: String
 }); //, { timestamps: true }
-
+// Pre-save hook to generate unique Location code
+// ServiceCategorySchema.pre('save', function(next) {
+//     if( this.isNew && !code){
+//         const timestamp =  Date.now();
+//         const ts  = Date.now().timestamps;         
+//         this.code = `SC0${timestamp}`
+//     }
+// });
 
 module.exports = { 
     masterSchema, 

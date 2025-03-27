@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authUser')
+/// change authenticateToken to adminAuth for admin access only
 
 const Providers = require('../controllers/providerController')
 
@@ -14,6 +15,12 @@ router.delete('/:id', authenticateToken, Providers.deleteProvider);
 router.get('/:id', authenticateToken, Providers.getProviderById);
 // Route to view all providers with authentication
 router.get('/', authenticateToken, Providers.getAllProviders);
+// Route to add new service to the provider with authentication
+router.post('/service', authenticateToken, Providers.addProviderService);
+// Route to update a service with authentication
+router.patch('/service/:id', authenticateToken, Providers.updateProviderService);
+// Route to delete a service with authentication
+router.delete('/service/:id', authenticateToken, Providers.deleteProviderService);
 
 
 module.exports = {providerRouter : router}

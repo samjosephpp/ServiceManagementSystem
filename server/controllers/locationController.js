@@ -72,12 +72,13 @@ const getAlllocationsWithState = async (req, res, next) => {
             mergedName: `${location.stateId.name} - ${location.name}`
         }));
 
+        // console.log(locationsWithMergedNames);
         res.status(200).json({
             data: locationsWithMergedNames,
             page: parseInt(page),
             limit: parseInt(limit),
-            totalLocations: locations.length,
-            totalPages: Math.ceil(locations.length / limit),
+            totalLocations: locationsWithMergedNames.length,
+            totalPages: Math.ceil(locationsWithMergedNames.length / limit),
             message: "Locations retrieved Successfully"
         });
 

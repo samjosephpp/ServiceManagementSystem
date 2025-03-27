@@ -1,15 +1,86 @@
 const express = require('express');
-const { model } = require('mongoose');
-
+// const { model } = require('mongoose');
+const mongoose = require('mongoose'); // Add this line
 
 const { ProviderService } = require('../models/providerModel')
 const services = require('../models/serviceModels')
 const { Payment } = require('../models/serviceModels');
 
 
-//To fetch available services for a given service category in a specific location
-const getAvailableServices = async (serviceCategoryId, locationId) => {
+// To get all available services for a given service category in a specific location
+const getAvailableServices = async (req, res, next) => {
     try {
+        // const { serviceCategoryId, locationId } = req.body; // Get query parameters from request or from body
+     
+        const serviceCategoryId = req.body.serviceCategoryId || req.query.serviceCategoryId;
+        const locationId = req.body.locationId || req.query.locationId;
+
+        // console.log("serviceCategoryId", serviceCategoryId, "locationId", locationId);
+        // console.log("req.query", req.query);
+
+
+        const { page = 1, limit = 10 } = req.query; // Default values: page 1, limit 10
+        // console.log("page", page, "limit", limit);
+        // find the starting and ending indices
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        // Build the query object
+        const query = {
+            isActive: true,
+            isApproved: true
+        };
+
+        if (serviceCategoryId) {
+            // // query.serviceCategoryId = new mongoose.Types.ObjectId(serviceCategoryId);
+            // query.serviceCategoryId = mongoose.Types.ObjectId.isValid(serviceCategoryId)
+            // ? new mongoose.Types.ObjectId(serviceCategoryId)
+            // : serviceCategoryId; // Use as-is if it's already valid
+            query.serviceCategoryId = serviceCategoryId;
+        }
+
+        if (locationId) {
+            // // query.locationId = new mongoose.Types.ObjectId(locationId)
+            // query.locationId = mongoose.Types.ObjectId.isValid(locationId)
+            // ? new mongoose.Types.ObjectId(locationId)
+            // : locationId; // Use as-is if it's already valid
+            query.locationId = locationId;
+        }
+        // console.log("query", query); 
+        
+        const services = await ProviderService.find(query, 'availabilityDays availabilityHours availabilityTime availabiltyFor rate description') // Select specific fields
+            .populate({ path: 'providerId', match: { isActive: true, isApproved: true }, select: 'name email phone' })
+            .populate('serviceCategoryId', 'name')  // Populate service category name
+            .populate('locationId', 'name') // Populate location name
+            .limit(limit).skip(startIndex); // Limit and skip results   
+
+        // Remove services with null provider (due to match filter)
+        const filteredServices = services.filter(service => service.providerId);
+       
+        // console.log("filteredServices", filteredServices);
+        
+        return res.status(200).json({ data: filteredServices, message: "Available services retrieved successfully" });
+
+        // return services.filter(service => service.providerId);
+
+    } catch (error) {
+        console.error("Error fetching available services:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching available services"
+        });
+    }
+
+}
+
+//To fetch available services for a given service category in a specific location
+const getAvailableServices0 = async (serviceCategoryId, locationId) => {
+    try {
+        const { page = 1, limit = 10 } = req.query; // Default values: page 1, limit 10
+        // find the starting and ending indices
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
         const services = await ProviderService.find({
             serviceCategoryId,
             locationId,
@@ -22,7 +93,8 @@ const getAvailableServices = async (serviceCategoryId, locationId) => {
                 match: { isActive: true, isApproved: true }, // Ensures provider is active and approved
                 select: 'name email phone'
             })
-            .populate('serviceCategoryId', 'name');
+            .populate('serviceCategoryId', 'name')
+            .limit(limit).skip(startIndex);
 
         // Remove services with null provider (due to match filter)
         return services.filter(service => service.providerId);
@@ -167,19 +239,19 @@ const serviceFeedback = async (req, res, next) => {
 
     if (!serviceId || !rating) {
         return res.status(400).json({ message: "Service ID and rating are required" });
-    }    
+    }
 
     try {
 
         //validate service status
-       const serviceRequest  = await services.ServiceRequest.findById({id : serviceId});
-        if(!serviceRequest) {
+        const serviceRequest = await services.ServiceRequest.findById({ id: serviceId });
+        if (!serviceRequest) {
             return res.status(400).json({ message: "Service Request not found" });
         }
         // if(serviceRequest.status !== 'Declined' || serviceRequest.status !==  'Completed') {
         //     return res.status(400).json({ message: "Service Request in process" });
         // }
-        
+
         if (serviceRequest.status !== 'Declined' && serviceRequest.status !== 'Completed') {
             return res.status(400).json({ message: "Service Request in process" });
         }
@@ -230,8 +302,8 @@ const updateRequestStatus = async (req, res, next) => {
         }
 
         const newServicelog = new services.ServiceLog({
-            requestId : _id,
-            log : log,
+            requestId: _id,
+            log: log,
             status: status
         })
         await newServicelog.save();
