@@ -71,9 +71,9 @@ const RequestService = () => {
 
             {!request_id ? (
                 <>
-                    {/* Page Heading */}
+                   
                     <h1 className="text-3xl font-bold text-center mb-6">Service Request Form</h1>
-                    {/* min-h-screen bg-gray-50   */}
+                   
                     <div className="flex justify-center items-center ">
                         <div className="p-6 bg-base-100 rounded-lg shadow-lg max-w-lg w-full">
                             <form onSubmit={handleSubmit} className="space-y-4">
