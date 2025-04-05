@@ -26,7 +26,7 @@ const authenticateToken = (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(400).json({ message: "User not authenticated" });
+        return res.status(400).json({ message: "User not authenticated 2" });
     }
 
 

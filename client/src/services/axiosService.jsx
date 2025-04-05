@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Create an Axios instance     //REACT_APP_SERVER_BASE_URL
@@ -56,6 +57,14 @@ axiosInstance.interceptors.response.use(
                 // Handle refresh token error, e.g., redirect to login page
                 window.location.href = '/login';
             }
+        }
+        if(error.response.status === 400) {
+            // Handle 400 error (Bad Request)
+            console.error('Bad Request:', error.response.data);
+            window.location.href = '/login';
+            return Promise.reject(error.response.data);
+            // AuthContext.logout();
+            // window.location.href = '/login';
         }
         return Promise.reject(error);
     }

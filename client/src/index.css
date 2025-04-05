@@ -5,3 +5,12 @@
 @plugin "daisyui" {
     themes: light --default, dark --prefersdark;
   }
+
+  /* :root {
+    font-family: Tahoma, system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+  } */
+  /* @tailwind base;
+  @tailwind components;
+  @tailwind utilities; */

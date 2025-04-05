@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { getAllActiveServiceCategories, getAvailableServices, getAllLocationsWithState } from "../../services/dataServices";
-
+import { AuthContext } from '../../context/AuthContext';
 import ServiceCard from "./ServiceCard";
 
+import { toast } from 'react-toastify';
+import {  Link, useNavigate } from 'react-router-dom';
 
 const Services = () => {
 
@@ -17,9 +19,20 @@ const Services = () => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedServiceCategory, setSelectedServiceCategory] = useState(null);
 
-
+    const { isLoggedIn, userRole } = useContext(AuthContext);
+    const navigate = useNavigate();
+ 
     const requestService = (service) => {
-        setSelectedService(service);
+        if(!isLoggedIn) {
+                console.log('Login to request')
+                toast.error('Login to request');
+        }
+        else{  
+            setSelectedService(service);  
+            navigate('/request-service', { state: { service } }); // Navigate to RequestService.jsx with service as state
+              
+        }
+       
     }
 
     const handleFilter = async () => {
@@ -140,7 +153,7 @@ const Services = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {services.length > 0 ? (
                     services.map((service) => (
-                        <ServiceCard key={service._id} service={service} requestService={requestService} />
+                        <ServiceCard key={service._id} service={service} requestService={requestService} isLoggedIn= {isLoggedIn}/>
                     ))
                 ) : (<span></span>)
                 }

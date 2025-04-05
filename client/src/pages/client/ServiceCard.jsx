@@ -2,9 +2,12 @@ import React from "react";
 import { FaMapMarkerAlt, FaCalendarDay, FaClock, FaMobileAlt, FaMailBulk } from "react-icons/fa";
 
 
-function ServiceCard({ service, requestService }) {
+function ServiceCard({ service, requestService, isLoggedIn }) {
+
+    // console.log(isLoggedIn)
+
     return (
-        <div className="card card-side bg-base-100 shadow-sm shadow-lg hover:shadow-xl transform hover:scale-101 transition-transform duration-500 ease-in-out">
+        <div className="card card-side bg-base-100 shadow-sm  hover:shadow-xl transform hover:scale-101 transition-transform duration-500 ease-in-out">
             <figure style={{ borderRight: "solid 1px #e4e3e3" }}>
                 <img className="rounded-lg w-full h-30 "
                     src={service.image || "../src/assets/default-services-icon-01.png"}
@@ -23,7 +26,7 @@ function ServiceCard({ service, requestService }) {
                     </div>
 
                 </div>
-                <div> <FaMapMarkerAlt className="inline-block mr-1 text-red-500" />   {service.locationId.name}</div>
+                <div> <FaMapMarkerAlt className="inline-block mr-1 text-red-500" /> {service.locationId.stateId.name} - {service.locationId.name}</div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
                         <span className="badge badge-soft badge-neutral">Availability</span>
@@ -44,8 +47,14 @@ function ServiceCard({ service, requestService }) {
                     <div className="flex items-center">
                         <div className="text-xs uppercase font-semibold">Price <span className="text-lg font-semibold"> ${service.rate}</span> </div>
                     </div>
-                    <div className="flex items-center">
-                        <button className="btn btn-primary btn-sm">Request Now</button>
+                    <div className="flex items-center">                        
+                        <button className="btn btn-primary btn-sm" id="btnRequest" name="btnRequest"
+                            disabled={!isLoggedIn} 
+                            onClick={() => requestService(service)}
+                            //onClick={requestService} 
+                            >
+                            {isLoggedIn ? "Request Now" : "Login to Request"}
+                        </button>
                     </div>
 
                     {/* <div className="flex items-center"> <div className="text-xs uppercase font-semibold opacity-60">Rating</div>

@@ -2,12 +2,15 @@
 import {jwtDecode} from 'jwt-decode';
 
 export const getLoggedInRole = (token) =>{
+    // console.log(`Token to be decode: ${token}`)
     if (token) {
         try {
             const decodedToken = jwtDecode(token);
-            // console.log(`Token to be decode: ${token}`)
-            console.log(`decodedToken ${decodedToken.role}`)
-            return decodedToken.role;
+            // console.log(decodedToken); 
+            // console.log(`decodedToken ${decodedToken.role}`)
+            // console.log(`decodedToken ${decodedToken.role_name}`)
+
+            return decodedToken.role_name;
         } catch (error) {
             console.error('Failed to decode token:', error);
             return null;
@@ -30,7 +33,8 @@ export const getLoggedInUserDetail = (token) => {
             let id = decodedToken.id;
             let email = decodedToken.email;
             let role = decodedToken.role;
-            return {  id, email, role };
+            let role_name = decodedToken.role_name;
+            return {  id, email, role, role_name };
         } catch (error) {
             console.error('Failed to decode token:', error);
             return null;

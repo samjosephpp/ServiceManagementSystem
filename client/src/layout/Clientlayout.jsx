@@ -8,7 +8,7 @@ const Clientlayout = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
-            <div className="flex-grow p-4">
+            <div className="flex-grow p-0">
                 <Outlet />
             </div>
             <Footer />

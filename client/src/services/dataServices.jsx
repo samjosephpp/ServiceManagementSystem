@@ -28,14 +28,14 @@ export const getAllActiveServiceCategories = async () => {
 }
 
 /// Get all available services
-export const getAvailableServices = async ( serviceCategoryId, selectedLocation) => {
+export const getAvailableServices = async (serviceCategoryId, selectedLocation) => {
     try {
         const params = {
             serviceCategoryId: serviceCategoryId,
             locationId: selectedLocation
         }
-      
-        const response = await axiosInstance.get(`${API_URL}/service/available-services`, {params});
+
+        const response = await axiosInstance.get(`${API_URL}/service/available-services`, { params });
         // return response.data;
         // const response = await axiosInstance.get('/services/available-services');
         return { success: response.status, message: response.data.message, data: response.data };
@@ -43,4 +43,38 @@ export const getAvailableServices = async ( serviceCategoryId, selectedLocation)
         // console.error(error);
         return { success: false, message: error.message?.data?.message || "Error" };
     }
+}
+
+// Create new Service Request
+export const createServiceRequest = async (formData) => {
+    try {
+        // console.log('Inside client  createServiceRequest')
+        // console.log(`formdata ${formData}`);
+
+        const params = {
+            providerId: formData.providerId._id,
+            providerServiceId: formData.providerServiceId,
+            stateId: formData.locationId.stateId._id,
+            locationId: formData.locationId._id,
+            address: formData.address,
+            amount: formData.amount,
+            remarks: formData.remarks
+        }
+        // console.log(params);
+
+        const response = await axiosInstance.post(`${API_URL}/service/service-request`, { params });
+        return { success: response.status, message: response.message?.data?.message, data: response.data };
+
+    } catch (error) {
+        return { success: false, message: error.message?.data?.message || "Error" };
+    }
+}
+
+// getServiceRequestsByUserOrProvider
+export const getServiceRequestsByUserOrProvider = async ({userId, providerId}) => {
+    const params = {
+        userId : userId,  providerId: providerId
+    }
+    const response = await axiosInstance.get(`${API_URL}/service/service-requests`, { params });
+    return { success: response.status, message: response.data.message, data: response.data };
 }

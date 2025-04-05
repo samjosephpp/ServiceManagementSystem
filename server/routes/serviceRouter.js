@@ -28,6 +28,8 @@ router.get('/available-services0',  async (req, res, next) => {
 //http://localhost:3000/api/services/service-requests?userId=12345&providerId=67890
 router.get('/service-requests', authenticateToken, serviceController.getServiceRequestsByUserOrProvider);
 
+// Route to create a service request with authentication
+router.post('/service-request', authenticateToken, serviceController.createRequest);
 // Route to view a service request by ID with authentication
 router.get('/service-request/:id', authenticateToken, serviceController.viewRequestById);
 // Route to update a service request by ID with authentication

@@ -12,12 +12,12 @@ export const AuthProvider = ({ children }) => {
         
          // console.log('Inside ResolveRole')
          const token = localStorage.getItem('token');
-         console.log(`Token to be decode: ${token}`)
+        //  console.log(`Token to be decode: ${token}`)
          if (token) {
              setIsLoggedIn(true);
             //  console.log(`Before Decoded role`)
              const role = getLoggedInRole(token);                  
-             console.log(`Decoded role: ${role}`)
+            //  console.log(`Decoded role: ${role}`)
              let userId = getLoggedInUserDetail(token).id;
  
              setUserRole(role);
@@ -46,14 +46,15 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        localStorage.removeItem('role');
+        localStorage.removeItem('role');    
+        localStorage.clear();
         setIsLoggedIn(false);
         setUserRole(null);
         setloggedUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userRole, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, userRole, login, logout, loggedUser }}>
             {children}
         </AuthContext.Provider>
     );

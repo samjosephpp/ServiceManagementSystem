@@ -140,11 +140,10 @@ const login = async (req, res, next) => {
         let role = req.body.role || 'Client'; // Set default role to 'client' if role is empty
         const RoleDb = await Role.findOne({ name: role });
     
-        const isUserExists = await User.findOne({ email: email, roleId: RoleDb._id });                                
+        const isUserExists = await User.findOne({ email: email  });           //     , roleId: RoleDb._id    
         const hashpassword = bcrypt.hashSync(password, 10);
         // console.log(hashpassword)
         if (!isUserExists) {
-
             return res.status(400).json({
                 message: "user not exits"
             })
@@ -209,9 +208,9 @@ const generateAllTokens = async (user) => {
     // console.log(user)
     const role = await Role.findById(user.roleId);
     const role_name = role.name;
-    console.log(role_name);
-    const accessToken = jwt.sign({ id: user._id, email: user.email,  role: user.role , role_name: role_name}, process.env.JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ id: user._id, email: user.email, role: user.role, role_name:role_name }, process.env.REFRESH_SECRET_KEY, { expiresIn: '7d' });
+    // console.log(role_name);
+    const accessToken = jwt.sign({ id: user._id, email: user.email,  role: user.roleId , role_name: role_name}, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ id: user._id, email: user.email, role: user.roleId, role_name:role_name }, process.env.REFRESH_SECRET_KEY, { expiresIn: '7d' });
 
     return { accessToken, refreshToken };
 };

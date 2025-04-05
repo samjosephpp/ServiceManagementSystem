@@ -4,13 +4,16 @@ import { router } from './routes/router'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
+import { AuthContext, AuthProvider } from './context/authContext'
 
 function App() {
- 
-  return (
-    <RouterProvider router={router}>
 
-    </RouterProvider>
+  return (
+    
+    <AuthProvider>
+      <RouterProvider router={router}>  </RouterProvider>
+    </AuthProvider>
+
   )
 }
 
