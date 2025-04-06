@@ -72,5 +72,17 @@ export let router = createBrowserRouter([
             }
         ]       
     }  ,
+    {
+        path: "/serviceprovider",
+        element: <h1>This is serviceprovider page</h1>,
+        // element:   <Adminlayout/>,
+        errorElement: <h1>Error page</h1>,
+        children:[
+            {
+
+            }
+        ]       
+    }  ,
+ 
     
   ]);

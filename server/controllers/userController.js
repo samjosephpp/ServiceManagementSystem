@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Client } = require('../models/clientModel');
 const { Provider } = require('../models/providerModel');
+const { Location } = require('../models/masterModels');
 
 // In-memory token storage (use a database in production)
 let refreshTokens = [];
@@ -13,24 +14,34 @@ const create = async (req, res, next) => {
 
     let client_id = null, provider_id = null;
     try {
-        const { name, email, password, phone,  stateId, locationId, address } = req.body;  //isPremiumMember,
+        const { name, email, password, phone,  locationId, address } = req.body;  //isPremiumMember,
         // console.log(req.body);
+
+        let stateId = req.body.stateId || null; // Set default stateId to null if not provided
+        // set stateId if it is not provided
+        if (!stateId || stateId === null) {
+            const location = await Location.findOne({ _id: locationId });
+            if (location) {
+                stateId = location.stateId;
+            }          
+        }        
+        // console.log("stateId", stateId);
         
         let role = req.body.role || 'Client'; // Set default role to 'client' if role is empty
         // console.log("role", role);
         const RoleDb = await Role.findOne({ name: role });
         // console.log(RoleDb)
         if (!RoleDb) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: "Invalid role",
                 success: false
             });
         }
-
-        const isUserExists = await User.findOne({ email: email, role: RoleDb._id });
+        // console.log(RoleDb)
+        const isUserExists = await User.findOne({ email: email}); //, role: RoleDb._id 
         
         if (isUserExists) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: "User already exists",
                 success: false
             });
@@ -40,14 +51,14 @@ const create = async (req, res, next) => {
         if (role === 'Client') {
             const isClientExists = await Client.findOne({ "email": email });
             if (!isClientExists) {  // if client not exists then create client
-                const client = new Client({ name, email, phone, locationId, createdBy : null, role:"Admin" }); // isPremiumMember
+                const client = new Client({ name, email, phone, locationId, createdBy : null }); // isPremiumMember  role:"Admin"
                 await client.save();
                 client_id = client._id;
                 // console.log(`New client created with ID: ${client_id}`);
          
             }
             else{
-                return res.status(400).json({
+                return res.status(409).json({
                     message: "Client already exists",
                     success: false
                 });
@@ -65,7 +76,7 @@ const create = async (req, res, next) => {
          
             }
             else{
-                return res.status(400).json({
+                return res.status(409).json({
                     message: "Provider already exists",
                     success: false
                 });
@@ -90,7 +101,7 @@ const create = async (req, res, next) => {
                 await Provider.deleteOne({ _id:
                     provider_id });       }
                     
-            return res.status(400).json({
+            return res.status(409).json({
                 message: "User not created",
                 success: false
             }); 
@@ -103,8 +114,12 @@ const create = async (req, res, next) => {
         const tokens = await generateAllTokens(user);
         refreshTokens.push(tokens.refreshToken)
         const token = tokens.accessToken;
+
+        // Exclude password from the user data   
+        const { password: userPassword, ...userWithoutPassword } = user._doc;
  
         return res.status(200).send({
+            data: userWithoutPassword,
             message: "User created successfully",
             success: true,
             token: token,
@@ -120,8 +135,8 @@ const create = async (req, res, next) => {
             await Provider.deleteOne({ _id:
                 provider_id });       }
 
-        console.log(error);
-        res.status(400).json({
+        // console.log(error);
+        res.status(409).json({
             message: "An error occurred",
             error: error.message,
             success: false

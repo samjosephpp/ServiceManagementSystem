@@ -21,7 +21,7 @@ export const registerUser = async (userData) => {
     try {
         // const response = await axios.post(`${API_URL}/users/register`, userData);
          // return response.data;
-        const response = await axiosInstance.post(`${API_URL}/users/register`, credentials, { withCredentials: true })
+        const response = await axiosInstance.post(`${API_URL}/users/register`, userData, { withCredentials: true })
         return {
             success: true, message: response.data.message, token: response.token, refreshToken: response.refreshToken,
             data: response.data
@@ -29,7 +29,8 @@ export const registerUser = async (userData) => {
        
     } catch (error) {
         console.error(error);
+        // console.log(error.response?.data?.message);
         // throw error.response?.data?.message || 'Error registering user';
-        return { success: false, message: error.message?.data?.message || "Error registering user" };
+        return { success: false, message: error.response?.data?.message || "Error registering user" };
     }
 }

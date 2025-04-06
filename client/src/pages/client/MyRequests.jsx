@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
 import { getServiceRequestsByUserOrProvider } from '../../services/dataServices';
- 
+
 const MyRequests = () => {
 
     const [serviceRequests, setServiceRequests] = useState([]);
@@ -39,7 +39,7 @@ const MyRequests = () => {
     function handleModalview(requestId) {
         const request = serviceRequests.find(request => request._id === requestId);
         setSelectedRequest(request);
-        setShowModal(true);      
+        setShowModal(true);
     }
     function closeModal() {
         setShowModal(false);
@@ -65,25 +65,35 @@ const MyRequests = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {serviceRequests.map((request) => (
-                            <tr key={request._id}>
-                                <td>{request.providerId.name}</td>
-                                <td>{request.providerServiceId.serviceCategoryId.name}</td>
-                                <td>${request.amount}</td>
-                                <td>
-                                    {request.status === 'Pending' && <span className="badge badge-warning">{request.status}</span>}
-                                    {request.status === 'Accepted' && <span className="badge badge-info">{request.status}</span>}
-                                    {request.status === 'Declined' && <span className="badge badge-error">{request.status}</span>}
-                                    {request.status === 'Completed' && <span className="badge badge-success">{request.status}</span>}
-                                </td>
-                                <td>
-                                    {request.isPaid === true && <span className="badge badge-success">Yes</span>}
-                                    {request.isPaid === false && <span className="badge badge-error">No</span>}
-                                </td>
-                                <td> {new Date(request.createdAt).toLocaleDateString('en-GB')}</td>
-                                <td><button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} >View</button> </td>
-                            </tr>
-                        ))}
+                        {
+                            serviceRequests && serviceRequests.length > 0 ? (
+                                serviceRequests.map((request) => (
+                                    <tr key={request._id}>
+                                        <td>{request.providerId.name}</td>
+                                        <td>{request.providerServiceId.serviceCategoryId.name}</td>
+                                        <td>${request.amount}</td>
+                                        <td>
+                                            {request.status === 'Pending' && <span className="badge badge-warning">{request.status}</span>}
+                                            {request.status === 'Accepted' && <span className="badge badge-info">{request.status}</span>}
+                                            {request.status === 'Declined' && <span className="badge badge-error">{request.status}</span>}
+                                            {request.status === 'Completed' && <span className="badge badge-success">{request.status}</span>}
+                                        </td>
+                                        <td>
+                                            {request.isPaid === true && <span className="badge badge-success">Yes</span>}
+                                            {request.isPaid === false && <span className="badge badge-error">No</span>}
+                                        </td>
+                                        <td> {new Date(request.createdAt).toLocaleDateString('en-GB')}</td>
+                                        <td><button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} >View</button> </td>
+                                    </tr>
+                                ))) : (
+                                <tr>
+                                    <td colSpan="7" className="text-center">
+                                       <p className="text-gray-600" >No requests found. </p>
+                                        
+                                    </td>
+                                </tr>
+                            )
+                        }
                     </tbody>
                 </table>
             </div>
