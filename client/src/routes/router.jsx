@@ -10,6 +10,20 @@ import Signup from "../pages/shared/signup";
 import RequestService from "../pages/client/RequestService";
 import MyRequests from "../pages/client/MyRequests";
 
+import Adminlayout from "../layout/Adminlayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import ManageUsers from "../pages/admin/ManageUsers";    
+import ManageLocations from "../pages/admin/ManageLocations";
+import ManageProviders from "../pages/admin/ManageProviders";
+import Manageproviderservices from '../pages/admin/Manageproviderservices';
+import ServiceRequests from "../pages/admin/ServiceRequests";
+
+
+import ServiceProviderlayout from "../layout/Providerlayout";
+import Dashboard   from "../pages/providers/dashboard";
+import Myservices from "../pages/providers/myservices";
+import Requests from "../pages/providers/Requests" ; 
+
 
 export let router = createBrowserRouter([
     {
@@ -62,27 +76,63 @@ export let router = createBrowserRouter([
     ]
     },   
     {
-        path: "/admin",
-        element: <h1>This is admin page</h1>,
-        // element:   <Adminlayout/>,
+        path: "/admin",      
+        element:   <Adminlayout/>,
         errorElement: <h1>Error page</h1>,
         children:[
             {
-
-            }
+                path: "",
+                element: <AdminDashboard/>
+            },
+            {
+                path: "dashboard",
+                element: <AdminDashboard/>
+            },
+            {
+                path: "users",
+                element: <ManageUsers/>
+            }, 
+            {
+                path: "locations",
+                element: <ManageLocations/>
+            },
+            {
+                path: "manageproviders",
+                element: <ManageProviders/>
+            },
+            {
+                path: "providerservices",
+                element: <Manageproviderservices/>
+            },
+            {
+                path: "serviceRequests",
+                element: <ServiceRequests/>
+            },            
         ]       
     }  ,
     {
         path: "/serviceprovider",
-        element: <h1>This is serviceprovider page</h1>,
-        // element:   <Adminlayout/>,
+        element: <ServiceProviderlayout/>,       
         errorElement: <h1>Error page</h1>,
         children:[
             {
-
-            }
+                path: "",
+                element: <Dashboard/>
+            },
+            {
+                path: "dashboard",
+                element: <Dashboard/>
+            }, 
+            {
+                path: "myservices",
+                element: <Myservices/>
+            }, 
+            {
+                path: "requests",
+                element: <Requests/>
+            }, 
         ]       
-    }  ,
+    },
  
     
   ]);
