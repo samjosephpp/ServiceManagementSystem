@@ -61,11 +61,12 @@ axiosInstance.interceptors.response.use(
         if(error.response.status === 400) {
             // Handle 400 error (Bad Request)
             console.error('Bad Request:', error.response.data);
-            window.location.href = '/login';
+            // window.location.href = '/login';
             return Promise.reject(error.response.data);
             // AuthContext.logout();
             // window.location.href = '/login';
         }
+        
         return Promise.reject(error);
     }
 );

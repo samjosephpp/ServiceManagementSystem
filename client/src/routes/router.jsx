@@ -4,6 +4,7 @@ import { createBrowserRouter } from "react-router-dom"
 import Clientlayout from "../layout/Clientlayout";
 import Home from "../pages/client/Home";
 import About from "../pages/client/About";
+import Contactus from "../pages/client/Contactus";
 import Services from "../pages/client/Services";
 import Login from "../pages/shared/login";
 import Signup from "../pages/shared/signup";
@@ -51,6 +52,10 @@ export let router = createBrowserRouter([
         {
             path: "about",
             element:  <About/>
+        }, 
+        {
+            path: "contactus",
+            element:  <Contactus/>
         }, 
         {
             path: "Services",

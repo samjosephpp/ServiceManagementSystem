@@ -15,10 +15,11 @@ const ProviderSchema = new mongoose.Schema({
 }); //, { timestamps: true }
 
 ProviderSchema.pre('save', function(next) { 
-    this.code = this.name.replace(/\s/g, '').toUpperCase();
+    // this.code = this.name.replace(/\s/g, '').toUpperCase();
     if(this.isNew) {
-        // this.code = this.code + Math.floor(Math.random() * 1000);
-    }   this.code = "SP" +  Math.floor(Math.random() * 1000);
+        this.code = "SP" +  Date.now() + Math.floor(Math.random() * 100000);
+    // }   this.code = "SP" +  Math.floor(Math.random() * 100000);
+    }
     next();
 })
 

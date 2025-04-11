@@ -21,6 +21,11 @@ router.post('/service', authenticateToken, Providers.addProviderService);
 router.patch('/service/:id', authenticateToken, Providers.updateProviderService);
 // Route to delete a service with authentication
 router.delete('/service/:id', authenticateToken, Providers.deleteProviderService);
+// Route to get all services for a provider with authentication
+router.get('/service/:id', authenticateToken, Providers.getAllProviderServices);
+// Route to get a provider service by ID with authentication
+router.get('/service/view/:id', authenticateToken, Providers.getProviderServiceById);
+
 
 
 module.exports = {providerRouter : router}

@@ -42,7 +42,7 @@ router.post('/service-feedback', authenticateToken, serviceController.serviceFee
 router.patch('/service-request/:id/status', authenticateToken, serviceController.updateRequestStatus);
 // Route to get all service requests with authentication
 router.get('/all-service-requests', authenticateToken, serviceController.getAllRequest);
-// Route to get available services
+// Route to get available services for a given service category in a specific location
 router.get('/available-services', serviceController.getAvailableServices);
 
 

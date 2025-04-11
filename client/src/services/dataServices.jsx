@@ -78,3 +78,69 @@ export const getServiceRequestsByUserOrProvider = async ({userId, providerId}) =
     const response = await axiosInstance.get(`${API_URL}/service/service-requests`, { params });
     return { success: response.status, message: response.data.message, data: response.data };
 }
+
+// Get all providers
+export const getAllProviders = async () => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/providers`);
+        return { success: response.status, message: response.data.message, data: response.data };
+    } catch (error) {
+        return { success: false, message: error.message?.data?.message || "Error" };
+    }
+}
+ 
+export const getAllProviderServices = async (providerId) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/providers/service/${providerId}`);
+        return { success: response.status, message: response.data.message, data: response.data };
+    } catch (error) {
+        return { success: false, message: error.message?.data?.message || "Error" };
+    }
+}   
+
+export const createProvider = async (formData) => {
+    try {
+        const params = {
+            name : formData.name, 
+            code : formData.code, 
+            locationId: formData.locationId, 
+            address: formData.address,
+            email: formData.email, phone: formData.phone, isActive: formData.isActive, isApproved: formData.isApproved
+        } 
+        const response = await axiosInstance.post(`${API_URL}/providers`, params);
+        // console.log("createProvider response", response);
+        // return { success: response.status, message: response.data.message, data: response.data, error: response.data.error };
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+    } catch (error) {
+        // console.log("createProvider error", error);
+        return { success: false, message: error.response?.data?.message || "Error in createProvider", data: error.data, error: error.data?.error };
+    }
+}
+
+export const updateProvider = async (formData) => {
+    try {
+        const params = {
+            name : formData.name, 
+            // code : formData.code, 
+            locationId: formData.locationId, 
+            address: formData.address,
+            // email: formData.email, 
+            phone: formData.phone, isActive: formData.isActive, isApproved: formData.isApproved
+        } 
+        const response = await axiosInstance.patch(`${API_URL}/providers/${formData._id}`, params);       
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+    } catch (error) {
+        // console.log("updateProvider error", error);
+        return { success: false, message: error.response?.data?.message || "Error in updateProvider", data: error.data, error: error.data?.error };
+    }
+}
+
+export const removeProvider = async (providerId) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/providers/${providerId}`);       
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+    } catch (error) {
+        // console.log("deleteProvider error", error);
+        return { success: false, message: error.response?.data?.message || "Error in deleteProvider", data: error.data, error: error.data?.error };
+    }
+}

@@ -61,11 +61,14 @@ const Header = () => {
                     <li onClick={() => handleMenuItemClick("/")}>
                         <a>Home</a>
                     </li>
-                    <li onClick={() => handleMenuItemClick("/about")}>
+                    {/* <li onClick={() => handleMenuItemClick("/about")}>
                         <a>About</a>
-                    </li>
+                    </li> */}
                     <li onClick={() => handleMenuItemClick("/services")}>
                         <a>Services</a>
+                    </li>
+                    <li onClick={() => handleMenuItemClick("/contactus")}>
+                        <a>Contact Us</a>
                     </li>
                     {isLoggedIn && (
                         <li onClick={() => handleMenuItemClick("/myrequest")}>
