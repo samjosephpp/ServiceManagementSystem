@@ -15,7 +15,7 @@ export const getAllLocationsWithState = async () => {
         return { success: false, message: error.message?.data?.message || "Error" };
     }
 }
-// Get all categories
+// Get all active categories
 export const getAllActiveServiceCategories = async () => {
     try {
         // const response = await axiosInstance.get(`/serviceCategory/active`);
@@ -23,6 +23,14 @@ export const getAllActiveServiceCategories = async () => {
         return { success: response.status, message: response.data.message, data: response.data };
     } catch (error) {
         // console.error(error);
+        return { success: false, message: error.message?.data?.message || "Error" };
+    }
+}
+export const getAllServiceCategories = async () => {
+    try {
+       const response = await axiosInstance.get(`${API_URL}/serviceCategory`);
+        return { success: response.status, message: response.data.message, data: response.data };
+    } catch (error) { 
         return { success: false, message: error.message?.data?.message || "Error" };
     }
 }
@@ -92,9 +100,12 @@ export const getAllProviders = async () => {
 export const getAllProviderServices = async (providerId) => {
     try {
         const response = await axiosInstance.get(`${API_URL}/providers/service/${providerId}`);
-        return { success: response.status, message: response.data.message, data: response.data };
+        // return { success: response.status, message: response.data.message, data: response.data };
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
     } catch (error) {
-        return { success: false, message: error.message?.data?.message || "Error" };
+        // return { success: false, message: error.message?.data?.message || "Error" };
+        return { success: false, message: error.response?.data?.message || "Error in deleteProvider", data: error.data, error: error.data?.error };
+
     }
 }   
 
@@ -142,5 +153,52 @@ export const removeProvider = async (providerId) => {
     } catch (error) {
         // console.log("deleteProvider error", error);
         return { success: false, message: error.response?.data?.message || "Error in deleteProvider", data: error.data, error: error.data?.error };
+    }
+}
+
+export const createProviderService = async (formData) => {
+    try {
+        const params = {
+            providerId : formData.providerId, 
+            serviceCategoryId: formData.serviceCategoryId, 
+            availabilityDays: formData.availabilityDays, 
+            availabilityHours: formData.availabilityHours, 
+            availabilityTime: formData.availabilityTime, 
+            availabiltyFor: formData.availabiltyFor, 
+            locationId: formData.locationId, 
+            isActive: formData.isActive,
+            isApproved: formData.isApproved,
+            rate: formData.rate
+        } 
+        const response = await axiosInstance.post(`${API_URL}/providers/service`, params);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+         
+    } catch (error) {
+        console.log("createProviderService error", error);
+        return { success: false, message: error.response?.data?.message || "Error in createProviderService", data: error.data, error: error.data?.error };
+    }
+}
+
+export const updateProviderService = async (formData) => {
+    try {
+        const params = {
+            _id: formData._id,
+            providerId : formData.providerId, 
+            serviceCategoryId: formData.serviceCategoryId, 
+            availabilityDays: formData.availabilityDays, 
+            availabilityHours: formData.availabilityHours, 
+            availabilityTime: formData.availabilityTime, 
+            availabiltyFor: formData.availabiltyFor, 
+            locationId: formData.locationId, 
+            isActive: formData.isActive,
+            isApproved: formData.isApproved,
+            rate: formData.rate
+        } 
+        const response = await axiosInstance.patch(`${API_URL}/providers/service/${formData._id}`, params);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+         
+    } catch (error) {
+        console.log("updateProviderService error", error);
+        return { success: false, message: error.response?.data?.message || "Error in updateProviderService", data: error.data, error: error.data?.error };
     }
 }

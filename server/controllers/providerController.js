@@ -81,7 +81,7 @@ const updateProvider = async (req, res, next) => {
                 console.log(error)
             }
         }
-        if (!name || !stateId || !locationId || !address ||  !phone) {
+        if (!name || !stateId || !locationId || !address || !phone) {
             return res.status(422).json({ message: "Missing required fields." })
         }
 
@@ -122,7 +122,7 @@ const deleteProvider = async (req, res, next) => {
         // if (!provider) {
         //     return res.status(404).json({ message: "Provider not exists." })
         // }
-        
+
         // check any service Request exists for this provider
         const serviceRequests = await ServiceRequest.find({ providerId: provider._id });
         if (serviceRequests.length > 0) {
@@ -141,7 +141,7 @@ const deleteProvider = async (req, res, next) => {
 
         // console.log("Deleted provider", provider);
 
-    
+
         res.status(200).json({
             success: true,
             data: provider,
@@ -191,29 +191,44 @@ const getAllProviders = async (req, res, next) => {
 // To add services for a provider
 const addProviderService = async (req, res, next) => {
     try {
-        const { providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive } = req.body;
+        const { providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive, isApproved } = req.body;
+
+        // console.log(req.body);
 
         if (!providerId || !serviceCategoryId || !rate) {
-            return res.status(400).json({ message: "Missing required fields." })
+            return res.status(422).json({ message: "Missing required fields.", success: false })
         }
         const provider = await Provider.findById(providerId);
         if (!provider) {
-            return res.status(404).json({ message: "Provider not exists." })
+            return res.status(404).json({ message: "Provider not exists.", success: false })
         }
         // Check if the service already exists for the provider
         const existingService = await ProviderService.findOne({ providerId, serviceCategoryId });
         if (existingService) {
-            return res.status(400).json({ message: "Service already exists for this provider." });
+            return res.status(406).json({ message: "Service already exists for this provider.", success: false });
         }
 
         const providerService = new ProviderService({
-            providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive,
+            providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate,
+            locationId, isActive, isApproved,
             createdBy: req.user.id,
             updatedBy: req.user.id
         });
 
-
         await providerService.save();
+
+        await providerService.populate('providerId', 'name');
+        await providerService.populate('serviceCategoryId', 'name');
+        await providerService.populate({
+            path: 'locationId',
+            select: 'name stateId',
+            populate: {
+                path: 'stateId',
+                select: 'name'
+            }
+        });
+
+
         // provider.services.push(service);
         // await provider.save();
 
@@ -223,8 +238,9 @@ const addProviderService = async (req, res, next) => {
             message: "Service Added Successfully"
         });
     } catch (error) {
+        console.log("Error in addProviderService ", error);
         next(error)
-        res.status(500).send(error);
+        // res.status(500).send(error);
     }
 
 }
@@ -233,33 +249,47 @@ const addProviderService = async (req, res, next) => {
 const updateProviderService = async (req, res, next) => {
     const id = req.params.id;
     try {
-        const { providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive } = req.body;
+        const { providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive, isApproved } = req.body;
         if (!providerId || !serviceCategoryId || !rate) {
-            return res.status(400).json({ message: "Missing required fields." })
+            return res.status(422).json({ message: "Missing required fields.", success: false })
         }
         const provider = await Provider.findById(providerId);
         if (!provider) {
-            return res.status(404).json({ message: "Provider not exists." })
+            return res.status(404).json({ message: "Provider not exists.", success: false })
         }
         // Check if the service already exists for the provider
         const existingService = await ProviderService.findOne({ _id: id, providerId, serviceCategoryId });
         if (!existingService) {
-            return res.status(400).json({ message: "Service does not exists for this provider." });
+            return res.status(404).json({ message: "Service does not exists for this provider.", success: false });
         }
 
         const providerService = await ProviderService.findOneAndUpdate({ _id: id, providerId, serviceCategoryId },
             {
-                providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive,
+                providerId, serviceCategoryId, availabilityDays, availabilityHours, availabilityTime, availabiltyFor, rate, locationId, isActive, isApproved,
                 updatedBy: req.user.id, updatedAt: Date.now()
             }
             , { new: true, runValidators: true });
+
+        await providerService.populate('providerId', 'name');
+        await providerService.populate('serviceCategoryId', 'name');
+        await providerService.populate({
+            path: 'locationId',
+            select: 'name stateId',
+            populate: {
+                path: 'stateId',
+                select: 'name'
+            }
+        });
+
+        console.log("providerService", providerService);
         res.status(200).json({
             success: true,
             data: providerService,
             message: "Service Updated Successfully"
         });
     } catch (error) {
-        res.status(500).send(error);
+        next(error)
+        // res.status(500).send(error);
     }
 }
 
@@ -284,19 +314,28 @@ const deleteProviderService = async (req, res, next) => {
 const getAllProviderServices = async (req, res, next) => {
     try {
         const providerServices = await ProviderService.find({ providerId: req.params.id })
-            .populate('stateId', 'name')
-            .populate('locationId', 'name')
+            // .populate('locationId', 'name') // .populate('stateId', 'name')
+            .populate({
+                path: 'locationId',
+                select: 'name stateId',
+                populate: {
+                    path: 'stateId',
+                    select: 'name'
+                }
+            })
             .populate('serviceCategoryId', 'name')
             .populate('providerId', 'name');
         if (!providerServices) {
-            return res.status(404).json({ message: "No services found." })
+            return res.status(404).json({ message: "No services found.", success: false })
         }
+
         res.status(200).json({
             success: true,
             data: providerServices,
             message: "Services Found Successfully"
         });
     } catch (error) {
+        console.log(error);
         res.status(500).send(error);
     }
 }
@@ -305,8 +344,16 @@ const getAllProviderServices = async (req, res, next) => {
 const getProviderServiceById = async (req, res, next) => {
     try {
         const providerService = await ProviderService.findById(req.params.id)
-            .populate('stateId', 'name')
-            .populate('locationId', 'name')
+            // .populate('stateId', 'name')
+            // .populate('locationId', 'name')
+            .populate({
+                path: 'locationId',
+                select: 'name stateId',
+                populate: {
+                    path: 'stateId',
+                    select: 'name'
+                }
+            })
             .populate('serviceCategoryId', 'name')
             .populate('providerId', 'name');
         if (!providerService) {
