@@ -202,3 +202,15 @@ export const updateProviderService = async (formData) => {
         return { success: false, message: error.response?.data?.message || "Error in updateProviderService", data: error.data, error: error.data?.error };
     }
 }
+
+
+export const removeProviderService = async (serviceId) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/providers/service/${serviceId}`);       
+        // return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+        // console.log("removeProviderService response", response);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+    } catch (error) {      
+        return { success: false, message: error.response?.data?.message || "Error in removeProviderService", data: error.data, error: error.data?.error };
+    }
+}

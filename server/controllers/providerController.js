@@ -112,36 +112,23 @@ const updateProvider = async (req, res, next) => {
 
 const deleteProvider = async (req, res, next) => {
     try {
-
         const provider = await Provider.findById(req.params.id);
         if (!provider) {
             return res.status(404).json({ message: "Provider does not exist." });
         }
-        // console.log("provider", provider);
-        // const provider = await Provider.findByIdAndDelete(req.params.id);
-        // if (!provider) {
-        //     return res.status(404).json({ message: "Provider not exists." })
-        // }
-
         // check any service Request exists for this provider
         const serviceRequests = await ServiceRequest.find({ providerId: provider._id });
         if (serviceRequests.length > 0) {
             return res.status(406).json({ message: "Provider has service requests. Can't delete." })
         }
-
         //check any services exists for this provider
         const providerServices = await ProviderService.find({ providerId: provider._id });
         if (providerServices.length > 0) {
             return res.status(406).json({ message: "Provider has services. Can't delete." })
         }
-
-
         // Delete the provider
         await Provider.findByIdAndDelete(req.params.id);
-
         // console.log("Deleted provider", provider);
-
-
         res.status(200).json({
             success: true,
             data: provider,
@@ -296,17 +283,25 @@ const updateProviderService = async (req, res, next) => {
 // To delete services for a provider
 const deleteProviderService = async (req, res, next) => {
     try {
-        const providerService = await ProviderService.findByIdAndDelete(req.params.id);
+        const providerService = await ProviderService.findById(req.params.id);
         if (!providerService) {
-            return res.status(404).json({ message: "Service not exists." })
+            return res.status(404).json({ message: "Service not exists." , success: false})
         }
+         // check any service Request exists for this provider
+         const serviceRequests = await ServiceRequest.find({  providerServiceId: providerService._id });
+         if (serviceRequests.length > 0) {
+             return res.status(406).json({ message: "Service has requests. Can't delete." , success: false })
+         }
+        await ProviderService.findByIdAndDelete(req.params.id); 
         res.status(200).json({
             success: true,
             data: providerService,
             message: "Service delete Successfully"
         });
     } catch (error) {
-        res.status(500).send(error);
+        console.log(error);
+        next(error)
+        // res.status(500).send(error);
     }
 }
 

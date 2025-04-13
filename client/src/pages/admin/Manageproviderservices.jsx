@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
-import { getAllProviders, getAllProviderServices, getAllLocationsWithState, getAllServiceCategories, createProviderService, updateProviderService } from "../../services/dataServices";
+import { getAllProviders, getAllProviderServices, getAllLocationsWithState, getAllServiceCategories, createProviderService, updateProviderService, removeProviderService } from "../../services/dataServices";
 import { FaCircleCheck, FaCertificate, FaRegTrashCan, FaFilePen } from "react-icons/fa6";
 
 import { toast } from 'react-toastify';
@@ -216,20 +216,27 @@ const Manageproviderservices = () => {
     setShowModal(true);
   }
 
-  function handleDeleteService(service) {
-    // console.log("Delete Serivce clicked");
+  const handleDeleteService = async(service) => {
+    // console.log("Delete Serivce clicked", service);
     if (!service) {
       toast.error('Failed to fetch service');
       return
     };
-    const confirmDelete = window.confirm(`Are you sure you want to delete the provider "${provider.name}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the Service "${service.serviceCategoryId.name}" of the provider "${selectedProvider.name}"?`);
     if (!confirmDelete) {
       return;
     }
-    toast.warning("Service deleted successfully!");
-    clearForm();
-    setShowModal(false);
-    setselectedProviderServices((prevServices) => prevServices.filter((s) => s._id !== service._id));
+    const response = await removeProviderService(service._id);
+    // console.log("response", response);
+    if (response.success) {
+      toast.warning("Service deleted successfully!");
+      clearForm();
+      setShowModal(false);
+      setselectedProviderServices((prevServices) => prevServices.filter((s) => s._id !== service._id));
+    } else {
+      toast.error(response.message || "An error occured");
+    }
+    
   }
 
   const resetButton = () => {
