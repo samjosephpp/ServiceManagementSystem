@@ -5,6 +5,7 @@ const mongoose = require('mongoose'); // Add this line
 const { ProviderService } = require('../models/providerModel')
 const services = require('../models/serviceModels')
 const { Payment } = require('../models/serviceModels');
+const { ServiceCategory } = require('../models/masterModels');
 
 
 // To get all available services for a given service category in a specific location
@@ -339,19 +340,86 @@ const updateRequestStatus = async (req, res, next) => {
 // Get All serviceRequest
 const getAllRequest = async (req, res, next) => {
     try {
-        const serviceRequests = await services.ServiceRequest.find()
-            .populate('clientId', 'name email')
-            .populate('providerId', 'name email')
-            .populate('providerServiceId', 'name')
-            .populate('stateId', 'name')
-            .populate('locationId', 'name');
+        let { providerId = null, locationId = null, serviceCategoryId = null, requestDate = null } = req.query || {};
+        const { page = 1, limit = 10 } = req.query; // Default values: page 1, limit 10
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
 
+        const status = req.query.status || null;
+        providerId = providerId === "" ? null : providerId;
+        locationId = locationId === "" ? null : locationId;
+        serviceCategoryId = serviceCategoryId === "" ? null : serviceCategoryId;
+        requestDate = requestDate === "" ? null : requestDate;
+
+        // console.log("req.query", req.query);
+
+        const query = {}; // clientId: { $ne: null }
+
+        if (providerId) {
+            query.providerId = providerId;
+        }
+
+        if (requestDate) {
+            const startDate = new Date(requestDate);
+            const endDate = new Date(requestDate);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+            query.createdAt = { $gte: startDate, $lte: endDate };
+        }
+
+        // if (status) {
+        //     query.status = status;
+        // }
+        if (locationId) {
+            query.locationId = locationId;
+        }
+       
+        // console.log("query", query);
+
+        let serviceRequests = await services.ServiceRequest.find(query)
+            .populate('providerServiceId', ' availabilityDays , availabilityHours  availabilityTime  availabiltyFor  rate')
+            // .populate('clientId', 'name email')             
+            .populate('providerId', 'name email')
+            .populate('stateId', 'name')
+            .populate('locationId', 'name')
+            .populate({
+                path: 'requestId', // Linking field in Payment schema   
+                model: 'Payment', // Explicitly specify the Payment model
+                select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields               
+            })
+            .populate({
+                path: 'providerServiceId', // Linking field in Payment schema   
+                model: 'ProviderService', // Explicitly specify the Payment model               
+                select: 'serviceCategoryId availabilityDays , availabilityHours  availabilityTime  availabiltyFor  rate', // Select specific fields
+                populate: {
+                    path: 'serviceCategoryId', // Populate serviceCategoryId within ProviderService
+                    model: 'ServiceCategory', // Explicitly specify the ServiceCategory model
+                    select: 'name description' // Select specific fields from ServiceCategory                
+                }
+            })
+            .populate({
+                path: 'requestId', // Linking field in Payment schema   
+                model: 'Payment', // Explicitly specify the Payment model
+                select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields
+            })
+            .sort({ createdAt: -1 })
+            .limit(limit).skip(startIndex);
+
+            // filter for service category
+        if (serviceRequests.length > 0 && serviceCategoryId) {
+            // console.log("serviceCategoryId", serviceCategoryId);           
+            // console.log("inside if");
+            const filteredserviceRequests =   serviceRequests.filter(service =>  service.providerServiceId.serviceCategoryId._id == serviceCategoryId);
+            // console.log("filteredserviceRequests", filteredserviceRequests);
+            serviceRequests = filteredserviceRequests;
+        }
         res.status(200).json({
             success: true,
             data: serviceRequests,
             message: "All service requests retrieved successfully"
         });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 }
@@ -410,25 +478,25 @@ const getServiceRequestsByUserOrProvider = async (req, res, next) => {
                 path: 'requestId', // Linking field in Payment schema   
                 model: 'Payment', // Explicitly specify the Payment model
                 select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields
-            })   
+            })
             .sort({ createdAt: -1 })
             .limit(limit).skip(startIndex);
 
-            //get service catetory details in the   providerServiceId in serviceRequest
-          
+        //get service catetory details in the   providerServiceId in serviceRequest
 
-            const serviceRequests = await services.ServiceRequest.find(query)
+
+        const serviceRequests = await services.ServiceRequest.find(query)
             .populate('providerServiceId', ' availabilityDays , availabilityHours  availabilityTime  availabiltyFor  rate')
             .populate('clientId', 'name email')
-            .populate('providerId', 'name email')            
-            .populate('stateId', 'name')            
-            .populate('locationId', 'name')            
+            .populate('providerId', 'name email')
+            .populate('stateId', 'name')
+            .populate('locationId', 'name')
             .populate({
                 path: 'requestId', // Linking field in Payment schema   
                 model: 'Payment', // Explicitly specify the Payment model
                 select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields               
             })
-            .populate({ 
+            .populate({
                 path: 'providerServiceId', // Linking field in Payment schema   
                 model: 'ProviderService', // Explicitly specify the Payment model               
                 select: 'serviceCategoryId availabilityDays , availabilityHours  availabilityTime  availabiltyFor  rate', // Select specific fields
@@ -442,11 +510,11 @@ const getServiceRequestsByUserOrProvider = async (req, res, next) => {
                 path: 'requestId', // Linking field in Payment schema   
                 model: 'Payment', // Explicitly specify the Payment model
                 select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields
-            })  
-            .sort({ createdAt: -1 })            
+            })
+            .sort({ createdAt: -1 })
             .limit(limit).skip(startIndex);
 
-            // console.log("serviceRequestsWithCategory", serviceRequestsWithCategory);
+        // console.log("serviceRequestsWithCategory", serviceRequestsWithCategory);
 
 
         // const serviceRequests = await services.ServiceRequest.aggregate([

@@ -87,6 +87,16 @@ export const getServiceRequestsByUserOrProvider = async ({userId, providerId}) =
     return { success: response.status, message: response.data.message, data: response.data };
 }
 
+// get All service Request for any given provider, date, location, status
+export const getAllServiceRequests = async ({providerId,  locationId, serviceCategoryId, requestDate }) => {
+    // providerId: selectedProvider, locationId: selectedLocation, serviceCategoryId: selectedServiceCategory, requestDate: selectedRequestDate 
+    const params = {
+        providerId : providerId, locationId: locationId,  serviceCategoryId: serviceCategoryId, requestDate: requestDate
+    }
+    const response = await axiosInstance.get(`${API_URL}/service/all-service-requests`, { params });
+    return { success: response.status, message: response.data.message, data: response.data };
+}
+
 // Get all providers
 export const getAllProviders = async () => {
     try {
