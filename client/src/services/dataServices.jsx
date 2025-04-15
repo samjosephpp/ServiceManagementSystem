@@ -224,3 +224,36 @@ export const removeProviderService = async (serviceId) => {
         return { success: false, message: error.response?.data?.message || "Error in removeProviderService", data: error.data, error: error.data?.error };
     }
 }
+
+export const getAllUsers = async () => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/users/users`);
+        return { success: response.status, message: response.data.message, data: response.data };
+    } catch (error) {
+        return { success: false, message: error.message?.data?.message || "Error", data: error.data, error: error.data?.error }
+    }
+}   
+
+export const updateUser = async (userId, formData) => {
+    try {
+        const params = {
+            name: formData.name, 
+            email: formData.email, 
+            phone: formData.phone, 
+            isActive: formData.isActive, 
+            isApproved: formData.isApproved
+        } 
+        const response = await axiosInstance.patch(`${API_URL}/users/user/${userId}`, params);       
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in updatedUser", data: error.data, error: error.data?.error }
+    }
+}
+export const removeUser = async (userId) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/users/user/${userId}`);       
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in removeUser", data: error.data, error: error.data?.error }
+    }
+}

@@ -24,7 +24,7 @@ const Login = () => {
     setError('');
     try {
       const response = await loginUser({email, password});
-        
+        // console.log("response", response);
       if(response.success){
             const role = getLoggedInRole(response.token);
             // console.log(`Decoded role in login: ${role}`)           
@@ -40,8 +40,8 @@ const Login = () => {
         setError(response.message || "An error occured")
         // toast.error(response.message || 'An error occurred');
       }     
-    } catch (error) {
-      setError('Invalid email or password');
+    } catch (error) {   
+      setError(error || 'Invalid email or password');
       // toast.error('Invalid email or password');
     }
   } 
