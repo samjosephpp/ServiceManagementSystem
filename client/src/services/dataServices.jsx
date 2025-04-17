@@ -4,6 +4,16 @@ import axiosInstance from "./axiosService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export const getAllStates = async () => {
+    try { 
+        const response = await axiosInstance.get(`${API_URL}/state`);
+        return { success: response.status, message: response.data.message, data: response.data };
+    } catch (error) {
+        // console.error(error);
+        return { success: false, message: error.message?.data?.message || "Error" };
+    }
+}
+
 // Get all locations with state
 export const getAllLocationsWithState = async () => {
     try {
