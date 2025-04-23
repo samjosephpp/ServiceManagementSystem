@@ -28,17 +28,17 @@ const CompanySchema = new mongoose.Schema({
 const StateSchema = new mongoose.Schema({
     ...masterSchema.obj,
     name: {type: String, required: true },
-    code: {type: String, required: true},
+    code: {type: String   },  //required: true, default: " " 
     description: String,
     isActive: {type : Boolean, default : true}
 });     //, { timestamps: true }
 // Pre-save hook to generate unique state code
 StateSchema.pre('save', function(next) {
-    if(!code){
-        const timestamp =  Date.now();
-        const ts  = Date.now().timestamps;         
-        this.code = `ST0${timestamp}`
-    }
+    if(this.isNew){         // && (!this.code || this.code.trim() === "")
+        // console.log("StateSchema pre save");
+        this.code = "ST"+ Date.now() + Math.floor(Math.random() * 1000);
+    }    
+    next();
 });
 
 
@@ -48,15 +48,14 @@ const LocationSchema = new mongoose.Schema({
     isActive:  { type : Boolean, default: true},
     stateId: { type: mongoose.Schema.Types.ObjectId, ref: 'State', required: true },
     pincode: String,
-    code: {type: String, required: true }
+    code: {type: String } //, required: true
 });     //, { timestamps: true }
 // Pre-save hook to generate unique Location code
 LocationSchema.pre('save', function(next) {
-    if(!code){
-        const timestamp =  Date.now();
-        const ts  = Date.now().timestamps;         
-        this.code = `L00${timestamp}`
+    if(this.isNew){
+        this.code = "L00"+ Date.now() + Math.floor(Math.random() * 100);
     }
+    next();   
 });
 
 const ServiceCategorySchema = new mongoose.Schema({

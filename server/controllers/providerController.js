@@ -308,6 +308,7 @@ const deleteProviderService = async (req, res, next) => {
 // To get all services for a provider
 const getAllProviderServices = async (req, res, next) => {
     try {
+        console.log("req.params.id", req.params.id);
         const providerServices = await ProviderService.find({ providerId: req.params.id })
             // .populate('locationId', 'name') // .populate('stateId', 'name')
             .populate({

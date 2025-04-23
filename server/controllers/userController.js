@@ -195,8 +195,13 @@ const login = async (req, res, next) => {
         refreshTokens.push(tokens.refreshToken)
         const token = tokens.accessToken;
 
+        // to populate roleId in user model
+        // await isUserExists.populate('roleId');
+
         // Exclude password from the user data   
         const { password: userPassword, ...userWithoutPassword } = isUserExists._doc;
+
+        
 
 
         // res.cookie('token', token); // instead of cookie we can use localstorage

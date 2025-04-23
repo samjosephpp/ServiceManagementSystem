@@ -8,8 +8,9 @@ router.get('/', authenticateToken, stateController.getAllStates )
 router.get('/active', authenticateToken,  stateController.getAllActiveStates )
 router.get('/:id',  authenticateToken, stateController.getStateById )
 router.post('/',  authenticateToken,  stateController.createState ) 
-router.put('/:id',  authenticateToken, stateController.updateState )
+router.patch('/:id',  authenticateToken, stateController.updateState )
 router.delete('/:id',  authenticateToken,  stateController.deleteState )
+router.patch('/status/:id',  authenticateToken, stateController.updateStateStatus )
  
 
 module.exports = {stateRouter : router}

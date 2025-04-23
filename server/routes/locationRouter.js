@@ -14,8 +14,8 @@ router.get('/:id',  authenticateToken, locationController.getLocationById )
 
 
 router.post('/',  authenticateToken,  locationController.createLocation ) 
-router.put('/:id',  authenticateToken, locationController.updateLocation )
+router.patch('/:id',  authenticateToken, locationController.updateLocation )
 router.delete('/:id',  authenticateToken,  locationController.deleteLocation )
- 
+router.patch('/status/:id',  authenticateToken, locationController.updateLocationStatus )
 
 module.exports = {locationRouter : router}
