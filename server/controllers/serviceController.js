@@ -216,6 +216,36 @@ const updateRequest = async (req, res, next) => {
     }
 }
 
+// to update request status and payment status
+const updateRequestStatusAndPayment = async (req, res, next) => {  
+    try {
+        const _id = req.params.id;
+        const { status, isPaid } = req.body;
+        const updatedRequest = await services.ServiceRequest.findByIdAndUpdate(
+            _id,
+            {
+                status,
+                isPaid,
+                UpdatedBy: req.user._id,
+                updatedAt: Date.now()
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedRequest) {
+            return res.status(404).json({ message: `Service Request with id ${_id} not found` });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: updatedRequest,    
+            message: "Service Request Updated Successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 //for request payment
 const servicePayment = async (req, res, next) => {
     const { requestId, amount, cardType, cardHolder, cardNumber, cardExpiry, cardccv, } = req.body;
@@ -402,6 +432,26 @@ const getAllRequest = async (req, res, next) => {
                 model: 'Payment', // Explicitly specify the Payment model
                 select: 'amount cardType cardHolder paymentStatus paymentDate' // Select specific fields
             })
+            // .populate({
+            //     path: 'createdBy', 
+            //     model: 'User',  
+            //     select: 'name email phone',
+            //     populate: {
+            //         path: 'clientId',  
+            //         model: 'Client', 
+            //         select: 'name email phone'  
+            //     }
+            //  })
+            .populate({
+                path: 'createdBy',
+                select: 'clientId',
+                populate: {
+                  path: 'clientId',
+                  model: 'Client',
+                  select: 'name email phone'
+                }
+              })
+            
             .sort({ createdAt: -1 })
             .limit(limit).skip(startIndex);
 
@@ -412,7 +462,17 @@ const getAllRequest = async (req, res, next) => {
             const filteredserviceRequests =   serviceRequests.filter(service =>  service.providerServiceId.serviceCategoryId._id == serviceCategoryId);
             // console.log("filteredserviceRequests", filteredserviceRequests);
             serviceRequests = filteredserviceRequests;
+            
         }
+
+        serviceRequests = serviceRequests.map((req) => {
+                const plain = req.toObject();            
+                return {
+                    ...plain,
+                    clientInfo: plain.createdBy?.clientId || null, // Rename nested populated field
+                };
+            });
+
         res.status(200).json({
             success: true,
             data: serviceRequests,
@@ -592,6 +652,7 @@ module.exports = {
     servicePayment,
     serviceFeedback,
     updateRequestStatus,
+    updateRequestStatusAndPayment,
     getAllRequest,
     getServiceRequestsByUserOrProvider
 }

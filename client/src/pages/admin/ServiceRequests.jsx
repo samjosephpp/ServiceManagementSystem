@@ -151,6 +151,7 @@ const ServiceRequests = () => {
                         <tr>
                             <th>Request Date</th>
                             <th>Provider</th>
+                            <th>Customer</th>
                             <th>Location</th>
                             <th>Service</th>
                             <th>Amount</th>
@@ -163,6 +164,7 @@ const ServiceRequests = () => {
                             <tr key={request._id}>
                                 <td>{new Date(request.createdAt).toLocaleDateString('en-GB')}</td>
                                 <td>{request.providerId.name}</td>
+                                <td>{  ( request.createdBy && request.createdBy.clientId ? request.createdBy.clientId.name : '' )}</td>
                                 <td>{request.stateId.name}-{request.locationId.name}</td>
                                 <td>{request.providerServiceId.serviceCategoryId.name}</td>
                                 <td>{request.amount}</td>
@@ -177,7 +179,7 @@ const ServiceRequests = () => {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan="7" className="text-center">No service requests found.</td>
+                                <td colSpan="8" className="text-center">No service requests found.</td>
                             </tr>
                         )
                         }

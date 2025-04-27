@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 
+import ErrorPage from "../pages/shared/ErrorPage";
 
 import Clientlayout from "../layout/Clientlayout";
 import Home from "../pages/client/Home";
@@ -15,9 +16,10 @@ import Adminlayout from "../layout/Adminlayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ManageUsers from "../pages/admin/ManageUsers";    
 import ManageLocations from "../pages/admin/ManageLocations";
-import ManageProviders from "../pages/admin/ManageProviders";
+import ManageProviders from "../pages/admin/Manageproviders";
 import Manageproviderservices from '../pages/admin/Manageproviderservices';
 import ServiceRequests from "../pages/admin/ServiceRequests";
+import AddProviderUser from "../pages/admin/addProvideruser"
 
 
 import ServiceProviderlayout from "../layout/Providerlayout";
@@ -43,7 +45,7 @@ export let router = createBrowserRouter([
     // },
     path: "/",
     element:   <Clientlayout/>,
-    errorElement: <h1>Error page</h1>,
+    errorElement: <ErrorPage /> ,// <h1>Error page</h1>,
     children:[
         {
             path: "",
@@ -83,7 +85,7 @@ export let router = createBrowserRouter([
     {
         path: "/admin",      
         element:   <Adminlayout/>,
-        errorElement: <h1>Error page</h1>,
+        errorElement: <ErrorPage /> ,//<h1>Error page</h1>,
         children:[
             {
                 path: "",
@@ -112,13 +114,17 @@ export let router = createBrowserRouter([
             {
                 path: "serviceRequests",
                 element: <ServiceRequests/>
-            },            
+            },  
+            {
+                path: "addprovideruser",
+                element: <AddProviderUser/>
+            },
         ]       
     }  ,
     {
         path: "/serviceprovider",
         element: <ServiceProviderlayout/>,       
-        errorElement: <h1>Error page</h1>,
+        errorElement:<ErrorPage />  ,//<h1>Error page</h1>,
         children:[
             {
                 path: "",

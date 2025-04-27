@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
 import { getAllProviders, getAllLocationsWithState, createProvider, updateProvider, removeProvider } from "../../services/dataServices";
-import { FaCircleCheck, FaCertificate } from "react-icons/fa6";
+import { FaCircleCheck, FaCertificate, FaUserPlus } from "react-icons/fa6";
 
 import { toast } from 'react-toastify';
+import {  useNavigate } from "react-router-dom";
 
 // import SingleProvider from "./singleProvider";
 
@@ -17,6 +18,7 @@ const Manageproviders = () => {
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const { isLoggedIn, userRole, loggedUser } = useContext(AuthContext);
+   const navigate = useNavigate();
 
   const [locations, setLocations] = useState([]);
 
@@ -133,7 +135,7 @@ const Manageproviders = () => {
     setSelectedProvider(null);
   }
   function handleAddProvider() {
-    console.log("Add Provider clicked 2");
+    // console.log("Add Provider clicked 2");
     setIsEditing(false)
     setShowModal(true);
   }
@@ -195,9 +197,20 @@ const Manageproviders = () => {
       setProviders((prevProviders) => prevProviders.filter((p) => p._id !== provider._id));
     } else {
       toast.error(response.message || "An error occured");
+    } 
+  }
+
+  const handleModalAddUser = (providerId) => {
+    // console.log("Add User clicked");
+    const provider = providers.find(provider => provider._id === providerId);
+    if (!provider) {
+      toast.error('Failed to fetch providers');
+      return;
     }
-
-
+    setSelectedProvider(provider);    
+    // console.log("provider", provider);
+    // navigate(`/admin/addProvideruser/${providerId}`, { state: { provider } }); 
+    navigate(`/admin/addprovideruser/`, { state: { provider } });      
   }
 
   const resetButton = () => {
@@ -256,7 +269,12 @@ const Manageproviders = () => {
                     </td>
                     <td>
                       <button className="btn btn-primary btn-sm mr-2" value={provider._id} onClick={() => handleModalview(provider._id)} >Edit</button>
-                      <button className="btn btn-error btn-sm" value={provider._id} onClick={() => deleteProvider(provider)} >Delete</button>
+                      <button className="btn btn-error btn-sm mr-2" value={provider._id} onClick={() => deleteProvider(provider)} >Delete</button>
+                      {provider.isActive ? (
+                        <button className="btn btn-accent btn-sm" value={provider._id} onClick={() => handleModalAddUser(provider._id)} > <FaUserPlus /> </button>
+                        // <Link to={`/admin/adduser/${provider._id}`}><button className="btn btn-accent btn-sm" > <FaUserPlus /> </button></Link>
+                      ) : (
+                        <></>)}
                     </td>
                   </tr>
                 ))

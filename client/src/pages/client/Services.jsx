@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import { getAllActiveServiceCategories, getAvailableServices, getAllLocationsWithState } from "../../services/dataServices";
 import { AuthContext } from '../../context/AuthContext';
 import ServiceCard from "./ServiceCard";
@@ -101,6 +101,10 @@ const Services = () => {
         fetchLocations();
     }, []);
 
+    useEffect(() => {
+        handleFilter();
+    }, [selectedServiceCategory, selectedLocation]);
+
 
     if (loading) {
         return (<h2> <span className="loading loading-spinner loading-lg"></span></h2>)
@@ -127,7 +131,7 @@ const Services = () => {
                 <legend className="fieldset-legend">Filter</legend>
                 <div className="form-control  flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
-                        <select defaultValue="" className="select w-full" id="LocationsWithState" onChange={(e) => setSelectedLocation(e.target.value)} >
+                        <select defaultValue={selectedLocation || ""} className="select w-full" id="LocationsWithState" onChange={(e) => setSelectedLocation(e.target.value)} >
                             <option value="" >Select Your location</option>
                             {locations.map((location) => (
                                 <option key={location._id} value={location._id} >{location.mergedName}</option>
@@ -135,16 +139,16 @@ const Services = () => {
                         </select>
                     </div>
                     <div className="flex-1">
-                        <select defaultValue="" className="select w-full" id="ServiceCategories" onChange={(e) => setSelectedServiceCategory(e.target.value)}>
+                        <select defaultValue={selectedServiceCategory || ""} className="select w-full" id="ServiceCategories" onChange={(e) => setSelectedServiceCategory(e.target.value)}>
                             <option value="" >Select Your Service</option>
                             {serviceCategories.map((serviceCategory) => (
                                 <option key={serviceCategory._id} value={serviceCategory._id} >{serviceCategory.name}</option>
                             ))}
                         </select>
                     </div>
-                    <div className="flex-1">
+                    {/* <div className="flex-1">
                         <button className="btn btn-warning btn-md w-full md:w-auto" onClick={handleFilter} >Apply</button>
-                    </div>
+                    </div> */}
                 </div>
 
             </fieldset>

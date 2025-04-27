@@ -10,6 +10,7 @@ const { locationRouter } = require('./routes/locationRouter');
 const { serviceRouter } = require('./routes/serviceRouter');
 const {serviceCategoryRouter} = require('./routes/serviceCategoryRouter');
 const {providerRouter} = require('./routes/providerRouter');
+const { dashboardRouter } = require('./routes/dashboardRouter');
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,7 @@ app.use('/api/location' , locationRouter )
 app.use('/api/service' , serviceRouter )
 app.use('/api/serviceCategory', serviceCategoryRouter )
 app.use('/api/providers', providerRouter )
+app.use('/api/dashboard',dashboardRouter)
 
 
 // Handle error here

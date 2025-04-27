@@ -6,6 +6,7 @@ const { Client } = require('../models/clientModel');
 const { Provider } = require('../models/providerModel');
 const { Location } = require('../models/masterModels');
 const { ServiceRequest } = require('../models/serviceModels');
+const { get } = require('mongoose');
 
 // In-memory token storage (use a database in production)
 let refreshTokens = [];
@@ -174,7 +175,7 @@ const login = async (req, res, next) => {
         // console.log(hashpassword)
         if (!isUserExists) {
             return res.status(404).json({
-                message: "user not exits", success: false 
+                message: "user not exits", success: false
             })
         }
         // console.log(isUserExists)
@@ -186,7 +187,7 @@ const login = async (req, res, next) => {
         if (!isUserExists.isActive) {
             return res.status(404).json({ message: "User is not active", success: false });
         }
- 
+
         //const token = jwt.sign( { data: email }, process.env.JWT_SECRET)
         // const token = generateToken(email);
 
@@ -201,7 +202,7 @@ const login = async (req, res, next) => {
         // Exclude password from the user data   
         const { password: userPassword, ...userWithoutPassword } = isUserExists._doc;
 
-        
+
 
 
         // res.cookie('token', token); // instead of cookie we can use localstorage
@@ -320,5 +321,105 @@ const removeUser = async (req, res, next) => {
     }
 }
 
+const createProviderUser = async (req, res, next) => {
+    try {
+        const { name, email, password, phone, address } = req.body;
+        let client_id = null;
+        const provider_id = req.params.id;
 
-module.exports = { create, login, refreshtoken, logout, getAllUsers, updateuser, removeUser }
+        const provider = await Provider.findById(provider_id);
+        if (!provider) {
+            return res.status(404).json({ message: "Provider not found", success: false });
+        }
+
+        let stateId = req.body.stateId || null;
+        let locationId = req.body.locationId || null;  
+        let role = 'ServiceProvider';  //req.body.role || 
+
+        stateId = provider.stateId;
+        locationId = provider.locationId;  
+
+        // if (!stateId || stateId === null) {
+        //     try {
+        //         const location = await Location.findOne({ _id: locationId });
+        //         if (location) {
+        //             stateId = location.stateId;
+        //         }
+        //     } catch (error) {
+        //         console.log(error)
+        //     }
+        // }
+        if (!name || !stateId || !locationId || !address || !phone || !email || !password) {
+            return res.status(422).json({ message: "Missing required fields." })
+        }    
+        
+        const RoleDb = await Role.findOne({ name: role });
+        if (!RoleDb) {
+            return res.status(409).json({
+                message: "Invalid role",
+                success: false
+            });
+        }
+        const isUserExists = await User.findOne({ email: email, providerId: provider_id }); //, roleId: RoleDb._id
+        if (isUserExists) {
+            return res.status(409).json({
+                message: "User already exists",
+                success: false
+            });
+        }   
+        
+        const hashpassword = bcrypt.hashSync(password, 10);
+        const user = new User({
+            name, password: hashpassword, email, roleId: RoleDb._id, phone,
+            stateId, locationId, userType: role,
+            clientId: client_id, providerId: provider_id,
+            createdBy: req.user._id,
+            role: RoleDb.name
+        });
+        await user.save();
+        if (!user) {              
+            return res.status(409).json({
+                message: "User not created",
+                data: null,
+                success: false
+            });
+        }
+
+        const { password: userPassword, ...userWithoutPassword } = user._doc;
+
+        return res.status(200).send({
+            data: userWithoutPassword,
+            message: "User created successfully",
+            success: true             
+        })
+    } catch (error) {
+        next(error);
+        /*
+         res.status(409).json({
+            message: "An error occurred",
+            error: error.message,
+            success: false
+        });
+        */
+    }
+}
+
+const getAllProviderUsers = async (req, res, next) => {
+    try {
+        const providerId = req.params.id;
+        console.log("providerId", providerId);
+        const users = await User.find({ providerId: providerId }).populate('roleId')
+            .populate('locationId').populate('stateId')
+            .populate('clientId').populate('providerId');
+
+        res.status(200).json({
+            success: true, message: 'Users fetched successfully', data: users
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+module.exports = { create, login, refreshtoken, logout, getAllUsers, updateuser, removeUser, createProviderUser, getAllProviderUsers };

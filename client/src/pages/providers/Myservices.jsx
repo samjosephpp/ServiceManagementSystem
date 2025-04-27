@@ -42,7 +42,7 @@ const MyServices = () => {
             }
             const data = providerServices.data.data;
             setServices(data);
-            console.log("Services:", data);
+            // console.log("Services:", data);
         } catch (error) {
             setError(error.message);
         } finally {
@@ -114,7 +114,7 @@ const MyServices = () => {
                                 services.map((service) => (
                                     <tr key={service._id}>
                                         <td>{service.serviceCategoryId.name}</td>
-                                        <td> {service.locationId.stateId.name} - {service.locationId.name}</td>
+                                        <td>{service.locationId.stateId.name} - {service.locationId.name}</td>
                                         <td>
                                             <div className="grid grid-flow-row auto-rows-max">
                                                 <div>
@@ -150,56 +150,13 @@ const MyServices = () => {
                                         </td>
                                         <td></td>
                                     </tr>
-                                    // <tr key={service._id}>
-                                    //     <td>{service.providerId.name}</td>
-                                    //     <td>{service.serviceCategoryId.name}</td>
-                                    //     <td> {service.locationId.stateId.name} - {service.locationId.name}</td>
-                                    //     <td>
-                                    //         <div className="grid grid-flow-row auto-rows-max">
-                                    //             <div>
-                                    //                 <div className="grid grid-cols-2 gap-4">
-                                    //                     <div className="text-xs font-semibold">Days</div>
-                                    //                     <div className="text-xs">: {service.availabilityDays}</div>
-                                    //                 </div>
-                                    //             </div>
-                                    //             <div>
-                                    //                 <div className="grid grid-cols-2 gap-4">
-                                    //                     <div className="text-xs font-semibold">Hours</div>
-                                    //                     <div className="text-xs">: {service.availabilityHours}</div>
-                                    //                 </div>
-                                    //             </div>
-                                    //             <div>
-                                    //                 <div className="grid grid-cols-2 gap-4">
-                                    //                     <div className="text-xs font-semibold">Time</div>
-                                    //                     <div className="text-xs">: {service.availabilityTime}</div>
-                                    //                 </div>
-                                    //             </div>
-                                    //             <div>
-                                    //                 <div className="grid grid-cols-2 gap-4">
-                                    //                     <div className="text-xs font-semibold">Available For</div>
-                                    //                     <div className="text-xs">: {service.availabiltyFor}</div>
-                                    //                 </div>
-                                    //             </div>
-                                    //         </div>
-                                    //     </td>
-                                    //     <td>$ {service.rate}</td>
-                                    //     <td>
-                                    //         <FaCircleCheck className="text-xl inline-flex " style={{ color: service.isActive ? "green" : "red" }} />
-                                    //         <FaCertificate className="text-xl  inline-flex" style={{ color: service.isApproved ? "green" : "red" }} />
-                                    //     </td>
-                                    //     <td>
-                                    //         {/* <button className="btn btn-primary btn-xs mr-2" onClick={() => handleEditService(service)} >  <FaFilePen></FaFilePen>  </button>
-                                    //         <button className="btn btn-error btn-xs" onClick={() => handleDeleteService(service)} ><FaRegTrashCan></FaRegTrashCan></button> */}
-                                    //     </td>
-                                    // </tr>
                                 ))
                             ) : (
-                                <tr>   <td colSpan="6">
+                                <tr><td colSpan="6">
                                     <div className="flex justify-center items-center h-32">
                                         <h3 className="text-md font-bold">No services found.</h3>
                                     </div>
-                                </td> </tr>
-
+                                </td></tr>
                             )
                         }
                     </tbody>

@@ -212,7 +212,7 @@ const RequestService = () => {
                         </div>
                     </div>
                 </>) : (
-                <div className="text-center">
+                <div className="flex flex-col justify-center items-center h-screen">
                     <h1 className="text-2xl font-bold text-green-600 mb-4">Service Request Form Saved Successfully!</h1>
                     <p className="text-lg">Your service request has been saved.</p>
                     <p className="text-md">Request Number : {requestNumber}</p>

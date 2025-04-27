@@ -101,6 +101,25 @@ export const createServiceRequest = async (formData) => {
     }
 }
 
+// update Service Request status and payment status
+export const updateRequestStatusAndPayment = async (formData) => {
+    try {
+        const params = {
+            status: formData.status,
+            paymentStatus: formData.paymentStatus
+        }
+        const response = await axiosInstance.patch(`${API_URL}/service/service-request/${formData._id}/status-payment`, params);
+        // return { success: response.status, message: response.data?.message, data: response.data };
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error };
+    }
+    catch (error) { 
+        return { success: false, message: error.message?.data?.message || "in updateProviderService" , data: error.data, error: error.data?.error };
+        //  return { success: false, message: error.response?.data?.message || "Error in updateProviderService", data: error.data, error: error.data?.error };
+ 
+    }
+}
+    
+
 // getServiceRequestsByUserOrProvider
 export const getServiceRequestsByUserOrProvider = async ({ userId, providerId }) => {
     const params = {
@@ -279,6 +298,33 @@ export const removeUser = async (userId) => {
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Error in removeUser", data: error.data, error: error.data?.error }
     }
+}
+export const createProviderUser = async (formData) => {
+    try {
+        const params = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            address: formData.address,
+            // providerId: formData.providerId,
+            // role: formData.role,
+            // isActive: formData.isActive
+        }
+        const response = await axiosInstance.post(`${API_URL}/users/user/${formData.providerId}/providerUser`, params);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in createProviderUser", data: error.data, error: error.data?.error }
+    }
+}
+
+export const getAllProviderUsers = async (providerId) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/users/user/provider/${providerId}`);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in getAllProviderUsers", data: error.data, error: error.data?.error }
+    }   
 }
 
 export const addNewState = async (formData) => {

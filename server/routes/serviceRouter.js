@@ -40,6 +40,8 @@ router.post('/service-payment', authenticateToken, serviceController.servicePaym
 router.post('/service-feedback', authenticateToken, serviceController.serviceFeedback);
 // Route to update the status of a service request with authentication
 router.patch('/service-request/:id/status', authenticateToken, serviceController.updateRequestStatus);
+// Route to update the status and payment status of a service request with authentication
+router.patch('/service-request/:id/status-payment', authenticateToken, serviceController.updateRequestStatusAndPayment);
 // Route to get all service requests with authentication
 router.get('/all-service-requests', authenticateToken, serviceController.getAllRequest);
 // Route to get available services for a given service category in a specific location
