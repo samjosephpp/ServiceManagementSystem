@@ -156,6 +156,7 @@ const ServiceRequests = () => {
                             <th>Service</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Is Paid</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -172,9 +173,9 @@ const ServiceRequests = () => {
                                     {request.status === 'Pending' && <span className="badge badge-warning">{request.status}</span>}
                                     {request.status === 'Accepted' && <span className="badge badge-info">{request.status}</span>}
                                     {request.status === 'Declined' && <span className="badge badge-error">{request.status}</span>}
-                                    {request.status === 'Completed' && <span className="badge badge-success">{request.status}</span>}
-
+                                    {request.status === 'Completed' && <span className="badge badge-success">{request.status}</span>}  
                                 </td>
+                                <td>{request.isPaid ? <span className="badge badge-success">Yes</span> : <span className="badge badge-error">No</span>}</td>
                                 <td><button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} ><FaEye /></button> </td>
                             </tr>
                         )) : (

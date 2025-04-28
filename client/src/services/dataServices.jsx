@@ -433,3 +433,32 @@ export const removeLocation = async (locationId) => {
         return { success: false, message: error.response?.data?.message || "Error in removeLocation", data: error.data, error: error.data?.error }
     }
 }   
+
+export const savePayment = async (formData) => {
+    try {
+        const params = {
+            requestId: formData. requestId,
+            paymentMethod: formData.paymentMethod,            
+            cardHolder: formData.cardHolder,
+            cardNumber: formData.cardNumber,
+            cardExpiry: formData.cardExpiry,
+            cardCcv: formData.cardCcv,
+            referenceNumber: formData.referenceNumber,
+            amount: formData.amount, 
+            paymentStatus: formData.paymentStatus,
+            paymentDate: formData.paymentDate,
+            // paymentId: formData.paymentId 
+        }
+        const response = await axiosInstance.post(`${API_URL}/service/service-payment`, params);
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in savePayment", data: error.data, error: error.data?.error }
+        
+    }  
+    // try {
+    //     const response = await axiosInstance.post(`${API_URL}/service-payment`, formData);  
+    //     return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    // } catch (error) {
+    //     return { success: false, message: error.response?.data?.message || "Error in removeLocation", data: error.data, error: error.data?.error }
+    // }
+}

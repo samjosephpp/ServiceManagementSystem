@@ -248,7 +248,7 @@ const updateRequestStatusAndPayment = async (req, res, next) => {
 
 //for request payment
 const servicePayment = async (req, res, next) => {
-    const { requestId, amount, cardType, cardHolder, cardNumber, cardExpiry, cardccv, } = req.body;
+    const { requestId, paymentMethod,   cardHolder, cardNumber, cardExpiry, cardccv, referenceNumber, amount, paymentStatus, paymentDate } = req.body;
 
     if (!requestId || !amount) {
         return res.status(400).json({ message: "Request ID and amount are required" });
@@ -257,12 +257,14 @@ const servicePayment = async (req, res, next) => {
         // Create a new payment
         const newPayment = new Payment({
             requestId,
-            amount,
-            cardType,
+            paymentMethod,
             cardHolder,
             cardNumber,
             cardExpiry,
-            cardccv,
+            cardccv,         
+            // cardType,
+            referenceNumber,
+            amount, 
             paymentStatus: 'Completed', // Default status
             paymentDate: Date.now(),
             createdBy: req.user._id,
@@ -271,6 +273,18 @@ const servicePayment = async (req, res, next) => {
 
         await newPayment.save();
 
+        if(!newPayment) {
+            return res.status(400).json({ message: "Payment not created" });
+        }
+
+        // update the service request with paid status
+        await services.ServiceRequest.findByIdAndUpdate(requestId, { isPaid: true });
+        // Update the service request with the payment ID
+        await services.ServiceRequest.findByIdAndUpdate(requestId, { paymentId: newPayment._id });
+        // // update the payment status in the service request
+        // await services.ServiceRequest.findByIdAndUpdate(requestId, { status: 'Completed' });
+        // // await services.ServiceRequest.findByIdAndUpdate(requestId, { isPaid: true });
+    
         res.status(201).json({
             success: true,
             data: newPayment,

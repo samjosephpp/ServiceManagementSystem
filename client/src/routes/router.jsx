@@ -26,6 +26,7 @@ import ServiceProviderlayout from "../layout/Providerlayout";
 import Dashboard   from "../pages/providers/dashboard";
 import Myservices from "../pages/providers/myservices";
 import Requests from "../pages/providers/Requests" ; 
+import Payment from "../pages/client/payment";
 
 
 export let router = createBrowserRouter([
@@ -79,6 +80,10 @@ export let router = createBrowserRouter([
             path: "myrequest",
             element:  <MyRequests />
         }, 
+        {
+            path: "payment",    
+            element:  <Payment/>
+        },
          
     ]
     },   

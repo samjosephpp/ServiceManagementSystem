@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
 import { getServiceRequestsByUserOrProvider } from '../../services/dataServices';
+import { FaMoneyBillTransfer } from "react-icons/fa6";
+import {  Link, useNavigate } from 'react-router-dom';
 
 const MyRequests = () => {
 
@@ -10,6 +12,7 @@ const MyRequests = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const { isLoggedIn, userRole, loggedUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     // console.log(loggedUser)
 
 
@@ -29,6 +32,12 @@ const MyRequests = () => {
         }
         fetchServiceHistory()
     }, []);
+
+    function handlePayment (request) {
+        setSelectedRequest(request);
+        navigate('/payment', { state: { request } }); // Navigate to Payment.jsx with request as state
+    }
+
     if (loading) {
         return (<h2> <span className="loading loading-spinner loading-lg"></span></h2>)
     }
@@ -83,13 +92,19 @@ const MyRequests = () => {
                                             {request.isPaid === false && <span className="badge badge-error">No</span>}
                                         </td>
                                         <td> {new Date(request.createdAt).toLocaleDateString('en-GB')}</td>
-                                        <td><button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} >View</button> </td>
+                                        <td>
+                                            <button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} >View</button>
+                                            {( (request.status === 'Pending' || request.status === 'Accepted') && !request.isPaid ) && (
+                                                <button className="btn btn-error btn-xs ml-2" onClick={() => handlePayment(request)}><FaMoneyBillTransfer className="inline-block mr-1 text-xs" /></button>
+                                            )}
+
+                                        </td>
                                     </tr>
                                 ))) : (
                                 <tr>
                                     <td colSpan="7" className="text-center">
-                                       <p className="text-gray-600" >No requests found. </p>
-                                        
+                                        <p className="text-gray-600" >No requests found. </p>
+
                                     </td>
                                 </tr>
                             )
