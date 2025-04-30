@@ -24,8 +24,8 @@ import AdminFeedbacks  from  "../pages/admin/Feedbacks"
 
 
 import ServiceProviderlayout from "../layout/Providerlayout";
-import Dashboard   from "../pages/providers/dashboard";
-import Myservices from "../pages/providers/myservices";
+import Dashboard   from "../pages/providers/Dashboard";
+import Myservices from "../pages/providers/Myservices";
 import Requests from "../pages/providers/Requests" ; 
 import ProviderFeedbacks from "../pages/providers/Feedbacks"
 
