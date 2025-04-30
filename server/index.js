@@ -16,6 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin:['https://service-management-system-iota.vercel.app',
+            'https://service-management-system-bapb5y1g3.vercel.app',
             'http://localhost:5173'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'] 

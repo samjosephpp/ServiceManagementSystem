@@ -14,7 +14,7 @@ import MyRequests from "../pages/client/MyRequests";
 
 import Adminlayout from "../layout/Adminlayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import ManageUsers from "../pages/admin/ManageUsers";    
+import ManageUsers from "../pages/admin/Manageusers";    
 import ManageLocations from "../pages/admin/ManageLocations";
 import ManageProviders from "../pages/admin/Manageproviders";
 import Manageproviderservices from '../pages/admin/Manageproviderservices';
