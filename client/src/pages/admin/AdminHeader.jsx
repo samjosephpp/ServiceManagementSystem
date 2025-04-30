@@ -6,11 +6,12 @@ import { AuthContext } from "../../context/AuthContext";
 
 const adminnavigation = [
     { name: 'Dashboard', href: '/admin/dashboard', current: true },
-    { name: 'ManageUsers', href: '/admin/users', current: false },
-    { name: 'ManageLocations', href: '/admin/locations', current: false },
-    { name: 'ManageProviders', href: '/admin/manageproviders', current: false },
-    { name: 'ManageServices', href: '/admin/providerservices', current: false },
+    { name: 'Users', href: '/admin/users', current: false },
+    { name: 'Locations', href: '/admin/locations', current: false },
+    { name: 'Providers', href: '/admin/manageproviders', current: false },
+    { name: 'Services', href: '/admin/providerservices', current: false },
     { name: 'ServiceRequests', href: '/admin/serviceRequests', current: false },
+    { name: 'Feedbacks', href: '/admin/feedbacks', current: false },
 ]
 
 function classNames(...classes) {

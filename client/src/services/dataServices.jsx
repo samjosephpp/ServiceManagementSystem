@@ -455,10 +455,33 @@ export const savePayment = async (formData) => {
         return { success: false, message: error.response?.data?.message || "Error in savePayment", data: error.data, error: error.data?.error }
         
     }  
-    // try {
-    //     const response = await axiosInstance.post(`${API_URL}/service-payment`, formData);  
-    //     return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
-    // } catch (error) {
-    //     return { success: false, message: error.response?.data?.message || "Error in removeLocation", data: error.data, error: error.data?.error }
-    // }
+    
+}
+
+// save feedback for a service request
+export const saveFeedback = async (formData) => {
+    try {
+        const params = {
+            userId: formData.userId,
+            requestId: formData.requestId, 
+            rating: formData.rating, 
+            comment: formData.comment
+        }
+        const response = await axiosInstance.post(`${API_URL}/service/service-feedback`, params);  
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in saveFeedback", data: error.data, error: error.data?.error }
+    }
+} 
+
+export const getAllFeedbacks = async({ userId  , requestId  , providerId  , serviceCategoryId  , rating   }) => {
+    try {
+        const params = {
+            userId: userId, requestId: requestId, providerId: providerId, serviceCategoryId: serviceCategoryId, rating: rating
+        }
+        const response = await axiosInstance.get(`${API_URL}/service/all-service-feedbacks`, { params });  
+        return { success: response.status, message: response.data?.message, data: response.data, error: response.data.error }
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message || "Error in getAllFeedbacks", data: error.data, error: error.data?.error }
+    } 
 }

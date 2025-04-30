@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, useLocation, useNavigate } from "react-router-dom";
 import { FaClock, FaCalendarDay } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -74,7 +74,7 @@ const Payment = () => {
         }
         if (formData.paymentMethod === 'Debit' || formData.paymentMethod === 'Credit') {
             if (!formData.cardHolder || !formData.cardNumber || !formData.cardExpiry || !formData.cardCvv) {
-                toast.error("Please fill in all required fields 0", {
+                toast.error("Please fill in all required card details", {
                     position: "top-right",
                     autoClose: 5000,
                     hideProgressBar: false,

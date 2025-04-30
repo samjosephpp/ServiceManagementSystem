@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
-import { getServiceRequestsByUserOrProvider } from '../../services/dataServices';
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import {  Link, useNavigate } from 'react-router-dom';
+import { getServiceRequestsByUserOrProvider, getAllFeedbacks } from '../../services/dataServices';
+import { FaMoneyBillTransfer, FaRankingStar } from "react-icons/fa6";
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 const MyRequests = () => {
 
@@ -11,6 +13,9 @@ const MyRequests = () => {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [selectedRequestFeedback, setSelectedRequestFeedback] = useState([]);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
     const { isLoggedIn, userRole, loggedUser } = useContext(AuthContext);
     const navigate = useNavigate();
     // console.log(loggedUser)
@@ -33,9 +38,25 @@ const MyRequests = () => {
         fetchServiceHistory()
     }, []);
 
-    function handlePayment (request) {
+    function handlePayment(request) {
         setSelectedRequest(request);
         navigate('/payment', { state: { request } }); // Navigate to Payment.jsx with request as state
+    }
+    async function handleFeedback(request) {
+        setSelectedRequest(request);
+        //check if the user has already provided feedback
+        const existingFeedback = await getAllFeedbacks({ userId: loggedUser._id, requestId: request._id });//feedback => feedback.userId === loggedUser._id && feedback.requestId === request._id);
+        // console.log("existingFeedback", existingFeedback);
+        if (existingFeedback) {
+            setSelectedRequestFeedback(existingFeedback.data.data[0]);
+            setShowFeedbackModal(true);
+            return;
+        }
+        navigate('/feedback', { state: { request } }); // Navigate to Feedback.jsx with request as state
+    }
+    function closeFeedbackModal() {
+        setShowFeedbackModal(false);
+        setSelectedRequestFeedback(null);
     }
 
     if (loading) {
@@ -94,8 +115,11 @@ const MyRequests = () => {
                                         <td> {new Date(request.createdAt).toLocaleDateString('en-GB')}</td>
                                         <td>
                                             <button className="btn btn-primary btn-xs" value={request._id} onClick={() => handleModalview(request._id)} >View</button>
-                                            {( (request.status === 'Pending' || request.status === 'Accepted') && !request.isPaid ) && (
-                                                <button className="btn btn-error btn-xs ml-2" onClick={() => handlePayment(request)}><FaMoneyBillTransfer className="inline-block mr-1 text-xs" /></button>
+                                            {((request.status === 'Pending' || request.status === 'Accepted') && !request.isPaid) && (
+                                                <button className="btn btn-info btn-xs ml-2" onClick={() => handlePayment(request)}>Pay<FaMoneyBillTransfer className="inline-block mr-1 text-xs" /></button>
+                                            )}
+                                            {(request.status === 'Completed' || request.status === 'Declined') && (
+                                                <button className="btn btn-xs  ml-2 btn-ghost" onClick={() => handleFeedback(request)}><FaRankingStar className=" text-2xl text-warning" /></button>
                                             )}
 
                                         </td>
@@ -151,6 +175,41 @@ const MyRequests = () => {
                         </div>
                         <div className="modal-action mt-6">
                             <button className="btn btn-primary" onClick={closeModal}>Close</button>
+                        </div>
+                    </div>
+                </dialog>
+            )}
+            {showFeedbackModal && selectedRequestFeedback && (
+                <dialog open className="modal">
+                    <div className="modal-box w-11/12 max-w-2xl bg-white rounded-lg shadow-lg p-6">
+                        <div className="flex flex-wrap justify-between items-center mb-4">
+                            <h3 className="font-bold text-2xl text-gray-800 text-center w-full md:w-auto mb-2 md:mb-0">
+                                Feedback
+                            </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-1  xs:grid-cols-1  gap-4">
+                            <div >
+                                <p><strong className="text-gray-600">Rating:</strong> 
+                                {/* <span className="text-gray-800">{selectedRequestFeedback.rating}</span> */}
+                                </p>
+                                <div className="rating">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <input
+                                            key={star}
+                                            type="radio"
+                                            name="rating"
+                                            className="mask mask-star bg-yellow-400"
+                                            aria-label={`${star} star`}
+                                            checked={selectedRequestFeedback.rating === star}
+                                            readOnly
+                                        />
+                                    ))}
+                                </div>
+                                <p><strong className="text-gray-600">Comment:</strong> <span className="text-gray-800">{selectedRequestFeedback.comment}</span></p>
+                            </div>
+                        </div>
+                        <div className="modal-action mt-6">
+                            <button className="btn btn-primary" onClick={closeFeedbackModal}>Close</button>
                         </div>
                     </div>
                 </dialog>

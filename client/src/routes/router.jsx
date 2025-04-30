@@ -20,13 +20,17 @@ import ManageProviders from "../pages/admin/Manageproviders";
 import Manageproviderservices from '../pages/admin/Manageproviderservices';
 import ServiceRequests from "../pages/admin/ServiceRequests";
 import AddProviderUser from "../pages/admin/addProvideruser"
+import AdminFeedbacks  from  "../pages/admin/Feedbacks"
 
 
 import ServiceProviderlayout from "../layout/Providerlayout";
 import Dashboard   from "../pages/providers/dashboard";
 import Myservices from "../pages/providers/myservices";
 import Requests from "../pages/providers/Requests" ; 
+import ProviderFeedbacks from "../pages/providers/Feedbacks"
+
 import Payment from "../pages/client/payment";
+import Feedback from "../pages/client/feedback";
 
 
 export let router = createBrowserRouter([
@@ -84,7 +88,10 @@ export let router = createBrowserRouter([
             path: "payment",    
             element:  <Payment/>
         },
-         
+        {
+            path: "feedback",    
+            element:  <Feedback/>
+        },
     ]
     },   
     {
@@ -124,6 +131,10 @@ export let router = createBrowserRouter([
                 path: "addprovideruser",
                 element: <AddProviderUser/>
             },
+            {
+                path: "feedbacks",
+                element: <AdminFeedbacks/>
+            },
         ]       
     }  ,
     {
@@ -146,6 +157,10 @@ export let router = createBrowserRouter([
             {
                 path: "requests",
                 element: <Requests/>
+            }, 
+            {
+                path: "feedbacks",
+                element: <ProviderFeedbacks/>
             }, 
         ]       
     },

@@ -38,6 +38,8 @@ router.put('/service-request/:id', authenticateToken, serviceController.updateRe
 router.post('/service-payment', authenticateToken, serviceController.servicePayment);
 // Route to create feedback for a service request with authentication
 router.post('/service-feedback', authenticateToken, serviceController.serviceFeedback);
+// Route to get all service requests feedback with authentication
+router.get('/all-service-feedbacks', authenticateToken, serviceController.getAllFeedbacks);
 // Route to update the status of a service request with authentication
 router.patch('/service-request/:id/status', authenticateToken, serviceController.updateRequestStatus);
 // Route to update the status and payment status of a service request with authentication

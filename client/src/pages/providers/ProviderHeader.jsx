@@ -7,6 +7,7 @@ const pnavigation = [
     { name: 'Dashboard', href: '/serviceprovider/dashboard', current: true },
     { name: 'Requests', href: '/serviceprovider/requests', current: false },
     { name: 'Services', href: '/serviceprovider/myservices', current: false },
+    { name: 'Feedbacks', href: '/serviceprovider/feedbacks', current: false },
     // { name: 'Calendar', href: '#', current: false },
 ]
 

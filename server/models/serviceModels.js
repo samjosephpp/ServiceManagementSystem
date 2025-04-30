@@ -82,7 +82,7 @@ PaymentSchema.pre('save', function (next) {
 const FeedbackSchema = new mongoose.Schema({
     ...masterSchema.obj,
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceRequest' },
+    requestId: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceRequest' },
     rating: Number,
     comment: String
 });     //, { timestamps: true }

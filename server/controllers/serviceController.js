@@ -4,7 +4,7 @@ const mongoose = require('mongoose'); // Add this line
 
 const { ProviderService } = require('../models/providerModel')
 const services = require('../models/serviceModels')
-const { Payment } = require('../models/serviceModels');
+// const { Payment , Feedback } = require('../models/serviceModels');
 const { ServiceCategory } = require('../models/masterModels');
 
 
@@ -196,7 +196,7 @@ const updateRequest = async (req, res, next) => {
                 remarks,
                 status,
                 isPaid,
-                UpdatedBy: req.user._id,
+                UpdatedBy: req.user.id,
                 updatedAt: Date.now()
             },
             { new: true } // Return the updated document
@@ -217,7 +217,7 @@ const updateRequest = async (req, res, next) => {
 }
 
 // to update request status and payment status
-const updateRequestStatusAndPayment = async (req, res, next) => {  
+const updateRequestStatusAndPayment = async (req, res, next) => {
     try {
         const _id = req.params.id;
         const { status, isPaid } = req.body;
@@ -226,7 +226,7 @@ const updateRequestStatusAndPayment = async (req, res, next) => {
             {
                 status,
                 isPaid,
-                UpdatedBy: req.user._id,
+                UpdatedBy: req.user.id,
                 updatedAt: Date.now()
             },
             { new: true } // Return the updated document
@@ -238,7 +238,7 @@ const updateRequestStatusAndPayment = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: updatedRequest,    
+            data: updatedRequest,
             message: "Service Request Updated Successfully"
         });
     } catch (error) {
@@ -248,32 +248,32 @@ const updateRequestStatusAndPayment = async (req, res, next) => {
 
 //for request payment
 const servicePayment = async (req, res, next) => {
-    const { requestId, paymentMethod,   cardHolder, cardNumber, cardExpiry, cardccv, referenceNumber, amount, paymentStatus, paymentDate } = req.body;
+    const { requestId, paymentMethod, cardHolder, cardNumber, cardExpiry, cardccv, referenceNumber, amount, paymentStatus, paymentDate } = req.body;
 
     if (!requestId || !amount) {
         return res.status(400).json({ message: "Request ID and amount are required" });
     }
     try {
         // Create a new payment
-        const newPayment = new Payment({
+        const newPayment = new services.Payment({
             requestId,
             paymentMethod,
             cardHolder,
             cardNumber,
             cardExpiry,
-            cardccv,         
+            cardccv,
             // cardType,
             referenceNumber,
-            amount, 
+            amount,
             paymentStatus: 'Completed', // Default status
             paymentDate: Date.now(),
-            createdBy: req.user._id,
-            UpdatedBy: req.user._id
+            createdBy: req.user.id,
+            UpdatedBy: req.user.id
         });
 
         await newPayment.save();
 
-        if(!newPayment) {
+        if (!newPayment) {
             return res.status(400).json({ message: "Payment not created" });
         }
 
@@ -284,7 +284,7 @@ const servicePayment = async (req, res, next) => {
         // // update the payment status in the service request
         // await services.ServiceRequest.findByIdAndUpdate(requestId, { status: 'Completed' });
         // // await services.ServiceRequest.findByIdAndUpdate(requestId, { isPaid: true });
-    
+
         res.status(201).json({
             success: true,
             data: newPayment,
@@ -297,35 +297,44 @@ const servicePayment = async (req, res, next) => {
 
 //for request feedback
 const serviceFeedback = async (req, res, next) => {
-    const { serviceId, rating, comment } = req.body;
+    const { requestId, rating, comment, userId } = req.body;
+
+    const serviceId = requestId;
+    // console.log("req.user" , req.user);
 
     if (!serviceId || !rating) {
-        return res.status(400).json({ message: "Service ID and rating are required" });
+        return res.status(422).json({ message: "Service ID and rating are required" });
     }
 
     try {
 
         //validate service status
-        const serviceRequest = await services.ServiceRequest.findById({ id: serviceId });
+        const serviceRequest = await services.ServiceRequest.findById({ _id: serviceId });
         if (!serviceRequest) {
-            return res.status(400).json({ message: "Service Request not found" });
+            return res.status(404).json({ message: "Service Request not found" });
         }
         // if(serviceRequest.status !== 'Declined' || serviceRequest.status !==  'Completed') {
         //     return res.status(400).json({ message: "Service Request in process" });
         // }
 
         if (serviceRequest.status !== 'Declined' && serviceRequest.status !== 'Completed') {
-            return res.status(400).json({ message: "Service Request in process" });
+            return res.status(406).json({ message: "Service Request in process" });
+        }
+
+        // Check if the user has already provided feedback for this service request
+        const existingFeedback = await services.Feedback.findOne({ userId, requestId });
+        if (existingFeedback) {
+            return res.status(406).json({ message: "You have already provided feedback for this service request" });
         }
 
         // Create a new feedback
         const newFeedback = new services.Feedback({
-            userId: req.user._id,
-            serviceId,
+            userId: req.user.id,
+            requestId,
             rating,
             comment,
-            createdBy: req.user._id,
-            UpdatedBy: req.user._id
+            createdBy: req.user.id,
+            UpdatedBy: req.user.id
         });
 
         await newFeedback.save();
@@ -341,6 +350,162 @@ const serviceFeedback = async (req, res, next) => {
 }
 
 
+// get all service feedbacks
+const getAllFeedbacks = async (req, res, next) => {
+    try {
+        let { userId = null, requestId = null, providerId = null, serviceCategoryId = null, rating = null } = req.query || {};
+        const { page = 1, limit = 10 } = req.query; // Default values: page 1, limit 10
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+ 
+        // Clean empty strings from query parameters
+        [userId, requestId, providerId, serviceCategoryId, rating] =
+            [userId, requestId, providerId, serviceCategoryId, rating].map(val => val === "" ? null : val);
+
+            // console.log("userId", userId);
+            // console.log("requestId", requestId);
+            // console.log("providerId", providerId);
+            // console.log("serviceCategoryId", serviceCategoryId);
+            // console.log("rating", rating);
+
+        const query = {};
+        if (userId) query.userId = userId;
+        if (requestId) query.requestId = requestId;
+        if (rating) query.rating = Number(rating);  // Convert rating to number
+        // if (providerId) query.providerId = providerId;
+        // if (serviceCategoryId) query.serviceCategoryId = serviceCategoryId;
+
+        // first data loading
+        let feedbacks = await services.Feedback.find(query)
+            .populate({
+                path: 'requestId',
+                select: 'providerId providerServiceId',
+                populate: [
+                    {
+                        path: 'providerId',
+                        model: 'Provider',
+                        select: 'name email phone'
+                    },
+                    {
+                        path: 'providerServiceId',
+                        model: 'ProviderService',
+                        select: 'serviceCategoryId availabilityDays availabilityHours availabilityTime availabilityFor rate',
+                        populate: {
+                            path: 'serviceCategoryId',
+                            model: 'ServiceCategory',
+                            select: 'name description'
+                        }
+                    }
+                ]
+            })
+            .populate({
+                path: 'userId',
+                select: 'name email phone'
+            })
+            .sort({ createdAt: -1 })
+            .skip(startIndex)
+            .limit(Number(limit));
+
+
+            // console.log("feedbacks", feedbacks);
+            
+        // Need to do post filter since the providerId and serviceCategoryId are not directly related to the requestId
+        // Post-filter by providerId and serviceCategoryId if provided
+        feedbacks = feedbacks.filter(fb => {
+            const req = fb.requestId;
+            const providerMatch = providerId ? req?.providerId?._id?.toString() === providerId : true;
+            const categoryMatch = serviceCategoryId
+                ? req?.providerServiceId?.serviceCategoryId?._id?.toString() === serviceCategoryId
+                : true;
+            return providerMatch && categoryMatch;
+        });
+
+        res.status(200).json({
+            success: true,
+            data: feedbacks,
+            totalCount : feedbacks.length,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(feedbacks.length / limit),
+            message: "All service feedbacks retrieved successfully"
+          });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getAllFeedbacks_0 = async (req, res, next) => {
+    try {
+        let { userId = null, requestId = null, providerId = null, serviceCategoryId = null, rating = null } = req.query || {};
+        const { page = 1, limit = 10 } = req.query; // Default values: page 1, limit 10
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        userId = userId === "" ? null : userId;
+        requestId = requestId === "" ? null : requestId;
+        providerId = providerId === "" ? null : providerId;
+        serviceCategoryId = serviceCategoryId === "" ? null : serviceCategoryId;
+        rating = rating === "" ? null : rating;
+
+        const query = {};
+        if (userId) {
+            query.userId = userId;
+        }
+        if (requestId) {
+            query.requestId = requestId;
+        }
+        if (providerId) {
+            query.providerId = providerId;
+        }
+        if (serviceCategoryId) {
+            query.serviceCategoryId = serviceCategoryId;
+        }
+        if (rating) {
+            query.rating = rating;
+        }
+
+        let feedbacks = await services.Feedback.find(query)
+            .populate({
+                path: 'requestId',
+                select: 'providerId',
+                populate: {
+                    path: 'providerId',
+                    model: 'Provider',
+                    select: 'name email phone'
+                }
+            })
+            .populate({
+                path: 'userId',
+                select: 'name email phone'
+            })
+            .populate({
+                path: 'requestId',
+                select: 'providerServiceId',
+                populate: {
+                    path: 'providerServiceId',
+                    model: 'ProviderService',
+                    select: 'serviceCategoryId availabilityDays , availabilityHours  availabilityTime  availabiltyFor  rate',
+                    populate: {
+                        path: 'serviceCategoryId', // Populate serviceCategoryId within ProviderService
+                        model: 'ServiceCategory', // Explicitly specify the ServiceCategory model
+                        select: 'name description' // Select specific fields from ServiceCategory                
+                    }
+                }
+            })
+            .sort({ createdAt: -1 })
+            .limit(limit).skip(startIndex);
+
+        res.status(200).json({
+            success: true,
+            data: feedbacks,
+            message: "All service feedbacks retrieved successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 //to update request status
 const updateRequestStatus = async (req, res, next) => {
     const _id = req.params.id;
@@ -353,7 +518,7 @@ const updateRequestStatus = async (req, res, next) => {
             _id,
             {
                 status,
-                UpdatedBy: req.user._id,
+                UpdatedBy: req.user.id,
                 updatedAt: Date.now()
             },
             { new: true } // Return the updated document
@@ -417,7 +582,7 @@ const getAllRequest = async (req, res, next) => {
         if (locationId) {
             query.locationId = locationId;
         }
-       
+
         // console.log("query", query);
 
         let serviceRequests = await services.ServiceRequest.find(query)
@@ -460,32 +625,32 @@ const getAllRequest = async (req, res, next) => {
                 path: 'createdBy',
                 select: 'clientId',
                 populate: {
-                  path: 'clientId',
-                  model: 'Client',
-                  select: 'name email phone'
+                    path: 'clientId',
+                    model: 'Client',
+                    select: 'name email phone'
                 }
-              })
-            
+            })
+
             .sort({ createdAt: -1 })
             .limit(limit).skip(startIndex);
 
-            // filter for service category
+        // filter for service category
         if (serviceRequests.length > 0 && serviceCategoryId) {
             // console.log("serviceCategoryId", serviceCategoryId);           
             // console.log("inside if");
-            const filteredserviceRequests =   serviceRequests.filter(service =>  service.providerServiceId.serviceCategoryId._id == serviceCategoryId);
+            const filteredserviceRequests = serviceRequests.filter(service => service.providerServiceId.serviceCategoryId._id == serviceCategoryId);
             // console.log("filteredserviceRequests", filteredserviceRequests);
             serviceRequests = filteredserviceRequests;
-            
+
         }
 
         serviceRequests = serviceRequests.map((req) => {
-                const plain = req.toObject();            
-                return {
-                    ...plain,
-                    clientInfo: plain.createdBy?.clientId || null, // Rename nested populated field
-                };
-            });
+            const plain = req.toObject();
+            return {
+                ...plain,
+                clientInfo: plain.createdBy?.clientId || null, // Rename nested populated field
+            };
+        });
 
         res.status(200).json({
             success: true,
@@ -668,5 +833,6 @@ module.exports = {
     updateRequestStatus,
     updateRequestStatusAndPayment,
     getAllRequest,
-    getServiceRequestsByUserOrProvider
+    getServiceRequestsByUserOrProvider,
+    getAllFeedbacks
 }
