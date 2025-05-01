@@ -18,7 +18,9 @@ app.use(cors({
     origin:['https://servicesystem.vercel.app',
             'http://localhost:5173'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'] 
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'] ,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    optionsSuccessStatus: 200 // Fixes CORS issues in some legacy browsers
 }));
 
 
