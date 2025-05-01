@@ -10,8 +10,8 @@ function ServiceCard({ service, requestService, isLoggedIn }) {
         <div className="card card-side bg-base-100 shadow-sm  hover:shadow-xl transform hover:scale-101 transition-transform duration-500 ease-in-out">
             <figure style={{ borderRight: "solid 1px #e4e3e3" }}>
                 <img className="rounded-lg w-full h-30 "
-                    src={service.image || "../src/assets/default-services-icon-01.png"}
-                    alt="Service" />
+                    // src={service.image || "../src/assets/default-services-icon-01.png"}
+                    src={service.image || "/images/default-services-icon-01.png"}  alt="Service" />
             </figure>
             <div className="card-body">
                 <h2 className="card-title  uppercase"> {service.serviceCategoryId.name}</h2>

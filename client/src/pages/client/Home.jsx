@@ -82,7 +82,8 @@ const Homepage = () => {
 
                             <figure className=" ">
                                 <div className=" ">
-                                    <img src={`../src/assets${cat.image}`} alt={cat.title} />
+                                    {/* <img src={`../src/assets${cat.image}`} alt={cat.title} /> */}
+                                    <img src={cat.image} alt={cat.title} />
                                 </div>
                             </figure>
                             <div className="card-body">
@@ -219,7 +220,8 @@ const Homepage = () => {
                         </ul>
                     </div>
                     <div className="flex justify-center items-center">
-                        <img src="../src/assets/images/pic1.jpg" alt="Why Choose Us" className="rounded-lg shadow-lg" />
+                        {/* <img src="../src/assets/images/pic1.jpg" alt="Why Choose Us" className="rounded-lg shadow-lg" /> */}
+                        <img src="/images/pic1.jpg" alt="Why Choose Us" />
                     </div>
                 </motion.div>
             </section>
