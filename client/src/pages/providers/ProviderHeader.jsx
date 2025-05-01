@@ -61,7 +61,8 @@ const ProviderHeader = () => {
                     </svg>
                 </div>
                 <a className="btn btn-ghost text-xl">
-                    <img src="../src/assets/logo-dark-1.png" alt="logo" />
+                    {/* <img src="../src/assets/logo-dark-1.png" alt="logo" /> */}
+                    <img src="/images/logo-dark-1.png" alt="logo" />
                 </a>
             </div>
 
