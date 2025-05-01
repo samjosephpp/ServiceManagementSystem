@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 *.env
+#     /* "start": "npx nodemon index.js" */
+
