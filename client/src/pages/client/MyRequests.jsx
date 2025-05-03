@@ -47,7 +47,7 @@ const MyRequests = () => {
         //check if the user has already provided feedback
         const existingFeedback = await getAllFeedbacks({ userId: loggedUser._id, requestId: request._id });//feedback => feedback.userId === loggedUser._id && feedback.requestId === request._id);
         // console.log("existingFeedback", existingFeedback);
-        if (existingFeedback) {
+        if (existingFeedback && existingFeedback.data.data.length > 0) {
             setSelectedRequestFeedback(existingFeedback.data.data[0]);
             setShowFeedbackModal(true);
             return;
